@@ -203,7 +203,60 @@ function joinSegment(rows, node) {
   };
 }
 
-function wrapSegment(joined, firstPrefix, nextPrefix, suffix, width, ending) {
+function widthSteps(value) {
+  // Tab widths depend only on the starting column modulo four.
+  return [0, 1, 2, 3].map((column) =>
+    textWidth(" ".repeat(column) + value) - column
+  );
+}
+
+function balancedSegment({ text, gaps }, firstPrefix, nextPrefix, suffix, width, ending) {
+  if (textWidth(firstPrefix + text + suffix) <= width) return text;
+  const starts = [0, ...gaps.map((gap) => gap.end)];
+  const ends = [...gaps.map((gap) => gap.start), text.length];
+  const tokens = starts.map((start, index) => widthSteps(text.slice(start, ends[index])));
+  const separators = gaps.map((gap) => widthSteps(text.slice(gap.start, gap.end)));
+  const trailing = widthSteps(suffix);
+  const firstColumn = textWidth(firstPrefix);
+  const nextColumn = textWidth(nextPrefix);
+  const best = new Array(tokens.length + 1);
+  best[tokens.length] = { lines: 0, cost: 0 };
+  // Bound the search; corrections that cannot be computed stay report-only.
+  let work = 1_000_000;
+  for (let start = tokens.length - 1; start >= 0; start--) {
+    let column = start === 0 ? firstColumn : nextColumn;
+    for (let end = start; end < tokens.length; end++) {
+      if (--work < 0) return null;
+      if (end > start) column += separators[end - 1][column % 4];
+      column += tokens[end][column % 4];
+      const actual = column + (end === tokens.length - 1 ? trailing[column % 4] : 0);
+      if (actual > width) break;
+      const following = best[end + 1];
+      if (!following) continue;
+      const lines = following.lines + 1;
+      const cost = following.cost + (width - actual) ** 2;
+      if (
+        !best[start] || lines < best[start].lines ||
+        (lines === best[start].lines && cost <= best[start].cost)
+      ) {
+        best[start] = { lines, cost, end };
+      }
+    }
+  }
+  if (!best[0]) return null;
+  const output = [];
+  for (let start = 0; start < tokens.length;) {
+    const end = best[start].end;
+    output.push(text.slice(starts[start], ends[end]));
+    start = end + 1;
+  }
+  return output.join(ending + nextPrefix);
+}
+
+function wrapSegment(joined, firstPrefix, nextPrefix, suffix, width, ending, strategy) {
+  if (strategy === "balanced") {
+    return balancedSegment(joined, firstPrefix, nextPrefix, suffix, width, ending);
+  }
   const { text, gaps } = joined;
   const output = [];
   let start = 0;
@@ -255,6 +308,7 @@ export default {
             { enum: ["nowrap", "ignore"] },
           ],
         },
+        strategy: { enum: ["greedy", "balanced"] },
       },
       additionalProperties: false,
     }],
@@ -321,6 +375,7 @@ export default {
                 sourceCode.text.slice(rows.at(-1).bodyEnd, rows.at(-1).end),
                 width,
                 ending,
+                context.options[0]?.strategy ?? "greedy",
               );
             if (replacement !== null && (
               replacement === sourceCode.text.slice(range[0], range[1]) ||

@@ -44,7 +44,7 @@ Preserve unrelated work. Prefer one coherent commit per PR and squash multiple t
 
 Update affected documentation and add CHANGELOG entries for features, improvements, and fixes, but not minor typos or the initial scaffold. Use `- [#123](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/123): Description - [@dblock](https://github.com/dblock).` with the actual PR number and contributor. Append entries chronologically above `- Your contribution here.` in the Next section. Predict the PR number before opening when reliable, then verify it and correct mismatches without unauthorized amending or force-pushing.
 
-Feature additions increment minor versions in the same PR: reset patch for `0.x`, preserve patch for `1.x` and later. Ask whether to bump major for breaking changes. Synchronize the package manifest and lockfile; see [Releasing](RELEASING.md).
+Feature additions increment minor versions in the same PR: reset patch for `0.x`, preserve patch for `1.x` and later. Once an unreleased minor version is prepared, collect further features in that same Next section until it is released. Ask whether to bump major for breaking changes. Synchronize the package manifest and lockfile; see [Releasing](RELEASING.md).
 
 Include the Copilot co-author trailer in AI-assisted commits and disclose AI authorship on behalf of `@dblock` in PRs/comments. Link related issues with closing references; leave them open until the PR merges. State actual validation and pending CI honestly.
 

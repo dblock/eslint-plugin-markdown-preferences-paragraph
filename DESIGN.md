@@ -12,9 +12,11 @@ The ESM plugin exports `meta`, `rules.wrap`, and `rules["max-words"]`. Register 
 | --- | --- |
 | Omitted or `"ignore"` | Leave paragraphs untouched. |
 | `"nowrap"` | Join safe soft line breaks without a maximum length. |
-| Positive integer | Greedily reflow safe segments to that source width, including widening existing short lines. |
+| Positive integer | Reflow safe segments to that source width, including widening existing short lines. |
 
 One width applies to every paragraph, including supported lists, blockquotes, and footnotes. Invalid widths, unknown options, container-specific settings, and URL exemptions are rejected. There is no automatically enabled preset.
+
+Numeric wrapping defaults to `strategy: "greedy"`. Opt-in `"balanced"` uses dynamic programming over the same safe whitespace boundaries: first minimize line count, then the sum of squared unused columns, including the final line and source prefixes/suffixes. Equal scores favor a longer first line. Cache width changes for all four tab positions and stop after one million candidate lines, leaving excessive searches report-only. Strategy is ignored for nonnumeric widths.
 
 `paragraph/max-words` accepts an explicit positive integer `max`; omission leaves paragraphs unchecked. Count prose and link labels using `Intl.Segmenter` with English word segmentation, including numbers but excluding punctuation, emoji, code, images, footnote markers, destinations, and titles. Formatting contributes its text; HTML tags are ignored and hard breaks separate words. Limits apply to whole paragraphs, independently of source wrapping. Report the count and maximum without fixes or suggestions.
 
