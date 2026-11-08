@@ -24,6 +24,8 @@ Keep Markdown prose paragraphs on one source line. Human-readable headings and Y
 
 Update affected documentation. Features, improvements, and fixes require a CHANGELOG entry with the actual PR number and contributor attribution; minor typos and the initial scaffold do not. Predict a PR number before opening when reliable, then verify and correct it. Append entries above the final placeholder in chronological order.
 
+Preserve the original editable `assets/logo.svg`, its MIT licensing, accessible metadata, and 160-pixel README placement above the title. Follow [Logo Maintenance](DESIGN.md#logo); inspect full-size and light/dark README rendering after artwork changes. The logo must remain in the npm archive, and generated previews must not be committed.
+
 For features, increment the minor version in the same PR; for `0.x`, reset patch to zero (`0.1.1` to `0.2.0`); for `1.x` and later, preserve patch (`5.3.1` to `5.4.1`). For breaking changes, ask whether to bump major. Synchronize `package.json` and `package-lock.json`; metadata derives its version from the package manifest.
 
 ## Git and Pull Requests

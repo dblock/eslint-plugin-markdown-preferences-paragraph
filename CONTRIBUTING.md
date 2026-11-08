@@ -30,6 +30,8 @@ Both API and CLI tests use the same [data-driven file fixtures](DESIGN.md#data-d
 
 ## Pull Requests
 
+For artwork changes, follow [Logo Maintenance](DESIGN.md#logo). Keep the editable SVG, license/provenance, descriptive alternative text, and 160-pixel README placement. Inspect full-size and light/dark README rendering; `npm test` checks that the real installed archive retains the logo. Keep generated previews outside the repository.
+
 Keep the primary checkout on `master`; use a separate worktree and `<username>/<topic>` branch for each PR. For example, after inspecting existing branches and worktrees:
 
 ```sh

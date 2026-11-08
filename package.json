@@ -9,6 +9,7 @@
   },
   "files": [
     "src/",
+    "assets/logo.svg",
     "README.md",
     "LICENSE",
     "CHANGELOG.md",

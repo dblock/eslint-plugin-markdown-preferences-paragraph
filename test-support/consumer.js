@@ -22,6 +22,7 @@ export async function consumer() {
     const paths = archive.files.map((file) => file.path);
     assert.ok(paths.includes("src/rules/paragraph-wrap.js"));
     assert.ok(paths.includes("LICENSE"));
+    assert.ok(paths.includes("assets/logo.svg"), "The README logo must be packaged.");
     assert.ok(paths.every((path) =>
       !/^(?:test|test-support|scripts|node_modules|coverage)\//u.test(path) &&
       !path.endsWith(".tgz")
@@ -39,6 +40,13 @@ export async function consumer() {
       "install", "--ignore-scripts", "--no-audit", "--no-fund",
       join(directory, archive.filename),
     ], { cwd: directory, stdio: "pipe" });
+    assert.deepEqual(
+      await readFile(join(
+        directory, "node_modules/eslint-plugin-markdown-preferences-paragraph-wrap/assets/logo.svg",
+      )),
+      await readFile(new URL("../assets/logo.svg", import.meta.url)),
+      "The installed package must retain the editable README logo.",
+    );
     await copyFile(
       new URL("./configuration.js", import.meta.url),
       join(directory, "configuration.js"),
