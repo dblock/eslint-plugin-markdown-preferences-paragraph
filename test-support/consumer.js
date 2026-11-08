@@ -41,7 +41,7 @@ export async function consumer(archivePath = process.env.PARAGRAPH_WRAP_PACKAGE_
     }));
     execFileSync(npm, [
       "install", "--ignore-scripts", "--no-audit", "--no-fund",
-      archivePath ?? join(directory, archive.filename),
+      archivePath || join(directory, archive.filename),
     ], { cwd: directory, stdio: "pipe" });
     assert.equal(
       JSON.parse(await readFile(join(directory,

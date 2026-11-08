@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 (Next)
+
+- [#18](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/18): Fix empty archive overrides during next-version validation and retain hidden release recovery artifacts - [@dblock](https://github.com/dblock).
+- Your contribution here.
+
 ## 0.2.0 (2026/11/08)
 
 - [#12](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/12): Replace custom documentation spelling with eslint-plugin-prose-spellcheck 0.1.0 - [@dblock](https://github.com/dblock).
