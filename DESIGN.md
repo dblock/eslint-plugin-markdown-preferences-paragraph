@@ -124,7 +124,9 @@ Check actual paragraph AST nodes at the document root and inside lists, blockquo
 
 In `"nowrap"` mode, report each soft-wrapped segment and join safe line boundaries with one space, without imposing any maximum length. Preserve existing intraline spacing and source spelling. A segment is the part of a paragraph between intentional hard-break boundaries.
 
-In numeric mode, report lines whose source display width exceeds the configured limit. Reflow only affected, safely editable segments at safe whitespace boundaries; do not fill short lines or canonicalize already compliant paragraphs. Count indentation, quote/list/footnote prefixes, and inline Markdown syntax in the source width, not rendered text width. Match upstream's documented implementation convention: Unicode display width with four-column tab stops, while preserving original UTF-16 offsets for ESLint fixes.
+In numeric mode, greedily reflow safely editable segments at safe whitespace boundaries to the configured width, including segments whose existing lines already fit. Increasing width from `30` to `80` therefore fills wider lines; decreasing it wraps them more narrowly. Leave already canonical wrapping unchanged. Count indentation, quote/list/footnote prefixes, and inline Markdown syntax in the source width, not rendered text width. Match upstream's documented implementation convention: Unicode display width with four-column tab stops, while preserving original UTF-16 offsets for ESLint fixes.
+
+Keep the existing `width` diagnostics for overlong lines. When all lines fit but a proven safe reflow would change the segment, report one fixable `reflow` diagnostic at its first line. Do not invent a reflow diagnostic when a safe correction cannot be established; overlong lines still report without a fix when unsafe or impossible to correct.
 
 Do not split words, URLs, link/image syntax, inline code, or other indivisible constructs to satisfy a width. URLs do not exempt surrounding prose from wrapping. If an atomic construct cannot fit, retain a diagnostic without an unsafe or endlessly repeated fix.
 
@@ -165,7 +167,7 @@ The scaffold includes source and embedded-JavaScript linting with ESLint and `@e
 | Modes and schema | Wrap/unwrap/ignore with the same width across root and nested paragraphs; invalid settings, including container-specific options and `ignoreUrls`, rejected; opt-in activation. |
 | Containers | Ordered/unordered and task lists, nested quotes/lists, lazy continuations, loose paragraphs, and footnotes under a supporting language; markers and structure unchanged. |
 | Breaks and inline syntax | Both Markdown hard-break forms; HTML breaks on either side of a boundary; escaped tags/backslashes; links, images, emphasis, inline code, Unicode, and literal content. |
-| Numeric limits | Prefix-inclusive widths, tabs and wide/combining characters; prose wraps around intact URLs; overlong indivisible URLs and other constructs report without fixes; already compliant paragraphs unchanged; no partial-fix loops. |
+| Numeric limits | Prefix-inclusive widths, tabs and wide/combining characters; prose wraps around intact URLs; overlong indivisible URLs and other constructs report without fixes; widening and narrowing reflow existing wrapping; canonical paragraphs unchanged; no partial-fix loops. |
 | Conservative fixes | Multiline literals, directive boundaries, ambiguous indentation, unknown extensions, and syntax-changing split points produce diagnostics without unsafe edits. |
 | Exclusions and stability | Non-paragraph blocks unchanged; configured front matter and math; LF/CRLF preservation; no fix overlap; a second fix pass makes no further changes. |
 | Real integration | ESLint CLI check and `--fix` with CommonMark/GFM, optional extended syntax, inline disable comments, and actual `max-len` coexistence configuration. |

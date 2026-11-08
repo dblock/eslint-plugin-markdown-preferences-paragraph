@@ -1,2 +1,2 @@
-Short lines
-stay short.
+Short lines stay
+short.

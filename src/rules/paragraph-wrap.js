@@ -261,6 +261,7 @@ export default {
     messages: {
       nowrap: "Keep each soft-wrapped paragraph segment on one source line.",
       width: "Source line width {{actual}} exceeds the maximum of {{width}}.",
+      reflow: "Reflow this paragraph segment to width {{width}}.",
     },
   },
   create(context) {
@@ -300,7 +301,8 @@ export default {
           const violations = width === "nowrap"
             ? (rows.length > 1 ? [rows[0]] : [])
             : rows.filter((row) => textWidth(row.content) > width);
-          if (!violations.length) continue;
+          const reflow = violations.length === 0;
+          if (width === "nowrap" && reflow) continue;
           const range = [rows[0].bodyStart, rows.at(-1).bodyEnd];
           const ending = lineEnding(rows, lines);
           let replacement = null;
@@ -320,7 +322,14 @@ export default {
                 width,
                 ending,
               );
-            if (replacement !== null && !verify(range, replacement)) replacement = null;
+            if (replacement !== null && (
+              replacement === sourceCode.text.slice(range[0], range[1]) ||
+              !verify(range, replacement)
+            )) replacement = null;
+          }
+          if (reflow) {
+            if (replacement === null) continue;
+            violations.push(rows[0]);
           }
           for (const [index, row] of violations.entries()) {
             context.report({
@@ -332,7 +341,7 @@ export default {
                 },
                 end: { line: row.number, column: row.content.length + 1 },
               },
-              messageId: width === "nowrap" ? "nowrap" : "width",
+              messageId: width === "nowrap" ? "nowrap" : reflow ? "reflow" : "width",
               data: { actual: String(textWidth(row.content)), width: String(width) },
               ...(index === 0 && replacement !== null ? {
                 fix: (fixer) => fixer.replaceTextRange(range, replacement),
