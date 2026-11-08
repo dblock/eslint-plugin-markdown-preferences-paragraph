@@ -4,17 +4,17 @@ Read [CONTRIBUTING](CONTRIBUTING.md) and [DESIGN](DESIGN.md) before changing cod
 
 ## Scope and Invariants
 
-This is currently a scaffold. The planned `paragraph-wrap` rule has one `width` option shared by every paragraph; no container-specific settings or URL exemptions. Do not introduce functionality before the scaffold review gate is approved. This is not a full Markdown formatter or an upstream `max-len` replacement.
+The `paragraph-wrap` rule has one `width` option shared by every paragraph; omitting it skips checks. There are no container-specific settings or URL exemptions. This is not a full Markdown formatter or an upstream `max-len` replacement.
 
-The plugin entry point is `src/index.js`; tests live in `test/`. Use public ESLint and Markdown language APIs, not upstream internal imports or global dependency mutation. Future fixes must preserve source offsets, inline literals, hard breaks, container structure, and line endings, and stabilize on a second pass. Unsafe edits must remain report-only. Follow DESIGN's data-driven file-fixture plan for implementation tests.
+The plugin entry point is `src/index.js`, and the rule is `src/rules/paragraph-wrap.js`. Tests live in `test/`, fixtures in `test/fixtures/integration/`, and shared test support in `test-support/`. Use public ESLint and Markdown language APIs, not upstream internal imports or global dependency mutation. Fixes must preserve source offsets, inline literals, hard breaks, container structure, and line endings, and stabilize on a second pass. Unsafe edits must remain report-only. Require AST equivalence under every public dialect matching the original document; do not guess the active language or rewrite unmatched extension syntax.
 
 ## Setup and Validation
 
 Use Node.js `26.13.0` from `.nvmrc` for development. The package supports Node.js `^22.13.0 || >=24.0.0`, ESLint 9.39 or later within 9.x and 10.x, and `@eslint/markdown` 8.x. Documentation spelling tools require Node.js 22.18 or later. Verify and prefer current stable releases when selecting or updating tools, while preserving supported-runtime compatibility.
 
-Run `npm ci`, then `npm test`, `npm run lint`, and `npm run package:check`. A focused test is `node --test test/plugin.test.js`; coverage is `npm run test:coverage`. Run tests and lint before every push, including PR updates. Run final validation before committing and reuse it for the push only if tested content and configuration have not changed. When packaging or public exports change, validate the real `npm pack` artifact in a temporary consumer with `npm run package:check`.
+Run `npm ci`, then `npm test`, `npm run lint`, and `npm run package:check`. A focused API fixture test is `node --test test/plugin.test.js`; coverage is `npm run test:coverage`. The full test command already includes the packaged CLI fixture suite; `npm run package:check` runs that suite alone, so reuse its result instead of immediately repeating it. Run tests and lint before every push, including PR updates. Run final validation before committing and reuse it for the push only if tested content and configuration have not changed. When packaging or public exports change, validate the real `npm pack` artifact in a temporary consumer.
 
-Keep Test, Lint, and Package workflows separate and retain coverage with Coveralls. `npm run lint` covers source, embedded JavaScript examples, Markdown source/prose/spelling, heading title case, and YAML workflow/job/step display-name title case. Embedded examples may leave variables unused because they are standalone excerpts; do not broadly disable source checks. Intentional fixtures are excluded from documentation linting.
+Keep Test, Lint, and Package workflows separate and retain coverage with Coveralls. Test matrices use explicit inline `matrix.entry` records without `include`/`exclude`. `npm run lint` covers source, embedded JavaScript examples, Markdown source/prose/spelling, heading title case, and YAML workflow/job/step display-name title case. Embedded examples may leave variables unused because they are standalone excerpts; do not broadly disable source checks. Intentional fixtures are excluded from documentation linting; preserve their expected bytes and targeted Git attributes.
 
 ## Documentation and Versions
 

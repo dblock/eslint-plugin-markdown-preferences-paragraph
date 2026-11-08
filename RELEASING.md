@@ -1,6 +1,6 @@
 # Releasing
 
-**Provisional:** No release automation, credentials, trusted publisher, or published package exists. These instructions describe the intended manual release procedure and do not authorize publishing, tags, or releases. Do not publish the nonfunctional scaffold.
+**Provisional:** No release automation, credentials, trusted publisher, or published package exists. These instructions describe the intended manual release procedure and do not authorize publishing, tags, or releases.
 
 ## Version and Validation
 
@@ -8,19 +8,19 @@ Synchronize `package.json` and `package-lock.json`, including the lockfile root 
 
 ```sh
 npm ci
-npm test
-npm run lint
 npm run test:coverage
-npm run package:check
+npm run lint
 ```
 
 Run tests and lint before every push. Keep the Test, Lint, and Package workflows separate and confirm their release-candidate checks succeed.
 
 ## Artifact and Publication
 
-After explicit authorization, pack the reviewed release commit with `npm pack --json`, inspect the resulting archive, and install that exact archive in a clean consumer. Verify public exports and actual ESLint check/fix behavior. The current `npm run package:check` validates and deletes its temporary archive; it does not preserve an artifact for publication, and its scaffold smoke test is not a functionality check.
+The coverage command runs `npm test`, including real packed-artifact CLI fixtures; `npm run package:check` runs only that integration suite when needed. Do not immediately repeat equivalent validation against unchanged files.
 
-Authenticate only through an explicitly authorized npm account or approved trusted-publishing setup; never add credentials to this repository. Check registry name ownership and that the intended version is unpublished. Publish the inspected tarball with `npm publish <archive.tgz> --access public`, not a newly packed checkout. Publication must wait for authorization and implemented functionality.
+After explicit authorization, pack the reviewed release commit with `npm pack --json`, inspect the resulting archive, and install that exact archive in a clean consumer. Verify public exports and actual ESLint check/fix behavior. `npm run package:check` validates and deletes its temporary archive; it does not preserve an artifact for publication.
+
+Authenticate only through an explicitly authorized npm account or approved trusted-publishing setup; never add credentials to this repository. Check registry name ownership and that the intended version is unpublished. Publish the inspected tarball with `npm publish <archive.tgz> --access public`, not a newly packed checkout. Publication must wait for authorization and approved functionality.
 
 ## Registry and Tag Verification
 

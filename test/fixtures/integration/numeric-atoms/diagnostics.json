@@ -1,0 +1,14 @@
+{
+  "before": [
+    { "messageId": "width", "line": 1, "column": 1, "fixable": false },
+    { "messageId": "width", "line": 3, "column": 1, "fixable": false },
+    { "messageId": "width", "line": 5, "column": 1, "fixable": false },
+    { "messageId": "width", "line": 7, "column": 1, "fixable": false }
+  ],
+  "after": [
+    { "messageId": "width", "line": 1, "column": 1, "fixable": false },
+    { "messageId": "width", "line": 3, "column": 1, "fixable": false },
+    { "messageId": "width", "line": 5, "column": 1, "fixable": false },
+    { "messageId": "width", "line": 7, "column": 1, "fixable": false }
+  ]
+}

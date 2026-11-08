@@ -1,0 +1,8 @@
+{
+  "before": [
+    { "messageId": "nowrap", "line": 1, "column": 3, "fixable": true },
+    { "messageId": "nowrap", "line": 4, "column": 5, "fixable": true },
+    { "messageId": "nowrap", "line": 7, "column": 5, "fixable": true }
+  ],
+  "after": []
+}
