@@ -6,7 +6,9 @@ import { ESLint } from "eslint";
 import codeConfig from "../eslint.config.js";
 
 const [major, minor] = process.versions.node.split(".").map(Number);
-const supportsSpelling = major > 22 || (major === 22 && minor >= 18);
+const [eslintMajor, eslintMinor] = ESLint.version.split(".").map(Number);
+const supportsSpelling = (major >= 24 || (major === 22 && minor >= 18)) &&
+  eslintMajor === 10 && eslintMinor >= 14;
 const root = new URL("./fixtures/documentation/", import.meta.url);
 
 function checkDiagnostics(messages, expected, phase) {

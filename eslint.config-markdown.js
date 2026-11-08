@@ -1,6 +1,7 @@
 import markdown from "@eslint/markdown";
 import preferences from "eslint-plugin-markdown-preferences";
 import paragraph from "eslint-plugin-markdown-preferences-paragraph";
+import proseSpellcheck from "eslint-plugin-prose-spellcheck";
 import documentation from "./scripts/documentation-plugin.js";
 
 export default [
@@ -13,6 +14,7 @@ export default [
       markdown,
       "markdown-preferences": preferences,
       paragraph,
+      "prose-spellcheck": proseSpellcheck,
       documentation,
     },
     language: "markdown/gfm",
@@ -35,7 +37,10 @@ export default [
         ],
       }],
       "paragraph/wrap": ["error", { width: "nowrap" }],
-      "documentation/spelling": "error",
+      "prose-spellcheck/spellcheck": ["error", {
+        dictionaries: ["@cspell/dict-en_us", "@cspell/dict-software-terms", "./.spellcheck.txt"],
+        baseDir: import.meta.dirname,
+      }],
       "documentation/first-heading": "error",
       "documentation/final-newline": "error",
     },

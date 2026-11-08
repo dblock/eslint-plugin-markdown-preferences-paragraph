@@ -1,238 +1,63 @@
 # Design
 
-**Status:** First implementation of the agreed scope; not published yet. Research checked on November 8, 2026.
-
 ## Purpose
 
-Create `eslint-plugin-markdown-preferences-paragraph`, an independent, opt-in ESLint plugin that checks and safely fixes Markdown paragraph wrapping. Support both positive numeric widths and `"nowrap"` in one `wrap` rule, without becoming a general Markdown formatter.
+`eslint-plugin-markdown-preferences-paragraph` checks and safely fixes Markdown paragraph wrapping. It is not a general formatter, replacement parser, or rendered-text layout tool.
 
-[To Wrap or Not to Wrap in Markdown?](https://code.dblock.org/2021/06/07/to-wrap-or-not-to-wrap-in-markdown.html) motivates one source line per paragraph: arbitrary reflow can turn a small wording edit into changes across several lines. This is a source-format preference, not a guarantee that all Markdown renderers treat soft line breaks identically.
+## Public API
 
-## Inventory
+The ESM plugin exports `meta` and `rules.wrap`. Register it as `paragraph` to configure `paragraph/wrap`; see [README](README.md) for installation and examples.
 
-The article names four existing enforcement tools and an ESLint proposal. `MD013` is also relevant because the article explicitly disables it. Formatters are distinguished from lint rules below.
+| Width | Behavior |
+| --- | --- |
+| Omitted or `"ignore"` | Leave paragraphs untouched. |
+| `"nowrap"` | Join safe soft line breaks without a maximum length. |
+| Positive integer | Greedily reflow safe segments to that source width, including widening existing short lines. |
 
-| Tool | Configuration and Default | Numeric Wrapping | Unwrapping | Implication |
-| --- | --- | --- | --- | --- |
-| [markdownlint-rule-single-line-paragraphs](https://github.com/dblock/markdownlint-rule-single-line-paragraphs) | Enable the custom `single-line-paragraphs` rule; no width setting. | Not supported. | Reports soft-wrapped paragraph segments and supplies coordinated joining/deletion fixes. | Strong precedent for narrow, paragraph-only enforcement, but not a combined wrap/unwrap API. |
-| [markdownlint `MD013` / `line-length`](https://github.com/DavidAnson/markdownlint/blob/main/doc/md013.md) | `line_length: 80`; headings, code blocks, and tables included by default; `strict` and `stern` default to `false`. | Reports overlong lines; documentation recommends splitting them. No automatic paragraph reflow. | Not supported. | A length constraint is not a wrapping preference. Disable `MD013` when using unrestricted single-line paragraphs; simply setting a huge limit is not unwrapping. |
-| [RuboCop `Prose/MaxLength`](https://github.com/dblock/rubocop-prose/blob/main/docs/cops/prose/max_length.md) | Enabled by default; `Max: false` means unwrapping, not disabling. `IgnoreURLs: true`. | A positive `Max` wraps prose, including container prefixes in the character budget. | `Max: false` joins soft line breaks. | Closest existing lint-rule precedent for combining both modes. Its [structural line-length cop](https://github.com/dblock/rubocop-prose/blob/main/docs/cops/markdown/structural_line_length.md) separates non-paragraph limits. |
-| [Prettier](https://prettier.io/docs/options#prose-wrap) | `proseWrap: "preserve"` by default; `printWidth: 80`. | `"always"` reflows prose toward `printWidth`, which is a formatting target rather than an absolute maximum. | `"never"` puts prose blocks on one source line. | Separates wrapping policy from width. `--check` enforces all Prettier formatting, not just paragraph wrapping; `"preserve"` does not unwrap existing text. |
-| [mdformat](https://mdformat.readthedocs.io/en/stable/users/configuration_file.html) | `wrap = "keep"` by default; also accepts `"no"` or an integer. | An integer requests wrapping. | `"no"` requests unwrapping. | Direct precedent for a width-or-keyword setting. Check/write modes also apply other formatting choices; CommonMark is the default, with extensions needed for additional dialects. |
-| [eslint-plugin-markdown-preferences `max-len`](https://ota-meshi.github.io/eslint-plugin-markdown-preferences/rules/max-len.html) | Paragraph default `120`; accepts numeric limits or `"ignore"`, with container overrides and `ignoreUrls: true`. | Reports overlong source lines; the current rule has no fixes. | Not supported in the current rule. | Existing paragraph ownership overlaps this plugin unless users explicitly disable those limits. |
+One width applies to every paragraph, including supported lists, blockquotes, and footnotes. Invalid widths, unknown options, container-specific settings, and URL exemptions are rejected. There is no automatically enabled preset.
 
-### Syntax and Exemption Differences
+Existing paragraph-length rules and formatters must use compatible policies. The plugin does not inspect or change their configuration.
 
-The markdownlint custom rule covers root, list, and blockquote paragraphs. It permits hard breaks from two or more trailing spaces or an unescaped trailing backslash, plus line-boundary `<br>`, `<br/>`, and `<br />` tags. Its README excludes headings, code blocks, tables, HTML blocks, front matter, and definitions; it does not advertise footnote-definition paragraph coverage.
+## Behavior
 
-`Prose/MaxLength` supports Markdown and plain text, preserves nesting, inline syntax, and hard breaks including `<br>`, and can report without correcting indented paragraphs or unbreakable overlong tokens. Its URL exemption is documented as paragraph lines containing only one URL. In contrast, ESLint's existing `max-len` exempts a line containing a recognized URL anywhere when `ignoreUrls` is enabled. These are materially different policies, not interchangeable options.
+Check paragraph AST nodes in CommonMark and GFM through `@eslint/markdown`. Leave non-paragraph blocks untouched; front matter and math require language options that recognize them.
 
-`MD013` has its own long-token exceptions: normal mode permits lines with no whitespace beyond the limit, `strict` removes that exception, and `stern` permits unbreakable lines while reporting lines that could be split. Link/image definitions and standalone link/image lines have additional exemptions. These policies should not be silently imported into a new ESLint rule.
+Count source syntax, indentation, and container prefixes using Unicode display width and four-column tab stops. Keep words, URLs, links, images, inline code, and other indivisible constructs intact. An overlong atomic construct remains report-only rather than receiving an incomplete fix.
 
-Prettier and mdformat are useful behavioral references, not implementation dependencies. Their broader formatting scope and default preservation modes differ from a focused ESLint diagnostic and fix.
-
-## Upstream Direction
-
-[Issue #338](https://github.com/ota-meshi/eslint-plugin-markdown-preferences/issues/338) initially proposed `single-line-paragraphs` without options. The [maintainer response](https://github.com/ota-meshi/eslint-plugin-markdown-preferences/issues/338#issuecomment-6646164240) instead favors `paragraph-wrap` owning both maximum paragraph width and unwrapping, using the term `"nowrap"` and eventually removing paragraph checking from `max-len`.
-
-The [latest proposal](https://github.com/ota-meshi/eslint-plugin-markdown-preferences/issues/338#issuecomment-6665919201) presents two alternatives: introduce `paragraph-wrap` and migrate paragraph ownership, or extend `max-len` without deprecation. The issue remains open; neither alternative should be described as accepted or released. [PR #332](https://github.com/ota-meshi/eslint-plugin-markdown-preferences/pull/332) remains open and unmerged and contains earlier unwrapping work.
-
-This project follows the separate `paragraph-wrap` direction but cannot deprecate, change, or disable another package's rule. It must document coexistence honestly. Any reuse of upstream code or fixtures requires reviewing their license and retaining applicable notices; this proposal does not assume a private upstream utility is a supported API.
-
-## Proposed Public API
-
-Use the repository and npm package name `eslint-plugin-markdown-preferences-paragraph`, under GitHub owner `dblock`. Before this pre-release rename on November 8, 2026, the GitHub repository lookup found no repository, and npm returned `E404` for the unscoped package name; these checks suggest availability but do not reserve the names or guarantee registry acceptance.
-
-Export one ESM plugin object with `meta` and `rules.wrap`. Register it as `paragraph` to use `paragraph/wrap`; the namespace is an ESLint configuration alias, not part of the exported rule name. There is no standalone CLI, replacement parser, fork of the upstream plugin, or automatic activation of unrelated rules.
-
-### Options
-
-| Option | Accepted Values | Proposed Default |
-| --- | --- | --- |
-| `width` | Positive integer, `"nowrap"`, or `"ignore"` | `"ignore"`; omitting `width` leaves paragraphs untouched. |
-
-Reject zero, negative or fractional widths, unsupported keywords, unknown properties, and incorrect types through the rule schema. `"ignore"` skips enforcement; ESLint severity `"off"` disables the entire rule.
-
-Apply the same `width` to every paragraph, including paragraphs inside lists, blockquotes, and supported footnote definitions. The first version has no container-specific overrides or policy precedence. This deliberately simplifies the latest upstream proposal while retaining paragraph coverage in all supported containers.
-
-There is no `ignoreUrls` option or URL-line exemption. Wrap surrounding prose at safe boundaries while keeping URLs intact. If an indivisible URL exceeds the configured width, report without fixing rather than splitting it or ignoring the entire line. URLs need no exception in `"nowrap"` mode.
-
-Do not ship an opinionated recommended preset in the first version. Enable the rule explicitly, and set `width: "nowrap"` for the user's preferred single-line prose or a positive integer for numeric wrapping. Enabling the rule without a `width`, including with an empty options object, does nothing.
-
-### Example Configuration
-
-The public consumer configuration is:
-
-```js
-import markdown from "@eslint/markdown";
-import paragraph from "eslint-plugin-markdown-preferences-paragraph";
-
-export default [
-  {
-    files: ["**/*.md", "**/*.markdown"],
-    plugins: {
-      markdown,
-      paragraph,
-    },
-    language: "markdown/gfm",
-    rules: {
-      "paragraph/wrap": [
-        "error",
-        { width: "nowrap" },
-      ],
-    },
-  },
-];
-```
-
-For numeric wrapping, use `{ width: 120 }`. Container-specific settings and `ignoreUrls` are not supported in the first version.
-
-### Coexistence With Existing Length Rules
-
-When also using `markdown-preferences/max-len`, explicitly ignore paragraph limits at the root and in every supported container. Numeric container settings must be replaced with entity-specific objects so they cannot reintroduce paragraph limits:
-
-```js
-const nonParagraphLimits = {
-  heading: 80,
-  table: 120,
-  html: 120,
-  code: "ignore",
-  frontmatter: "ignore",
-  math: "ignore",
-  paragraph: "ignore",
-};
-
-const maxLenOptions = {
-  ...nonParagraphLimits,
-  list: { ...nonParagraphLimits },
-  blockquote: { ...nonParagraphLimits },
-  footnoteDefinition: { ...nonParagraphLimits },
-  ignoreUrls: true,
-};
-
-// Add this to an existing configuration that registers markdown-preferences.
-export const rules = {
-  "markdown-preferences/max-len": ["error", maxLenOptions],
-};
-```
-
-Adapt existing non-paragraph limits rather than replacing deliberate project policies with these example values. With unrestricted `"nowrap"`, disable markdownlint `MD013`; align any formatter with the same wrapping policy. The plugin neither reads other rules' configuration nor guarantees conflict-free behavior under incompatible settings. A standalone companion cannot provide the maintainer's preferred exclusive ownership until upstream changes are released.
-
-## First-Version Behavior
-
-Check actual paragraph AST nodes at the document root and inside lists, blockquotes, and footnote definitions when the selected language parses them. Support CommonMark and GFM through `@eslint/markdown`, including task lists and GFM footnotes. Compatibility with `markdown-preferences/extended-syntax` is an optional integration, not a reason to create another parser.
-
-In `"nowrap"` mode, report each soft-wrapped segment and join safe line boundaries with one space, without imposing any maximum length. Preserve existing intraline spacing and source spelling. A segment is the part of a paragraph between intentional hard-break boundaries.
-
-In numeric mode, greedily reflow safely editable segments at safe whitespace boundaries to the configured width, including segments whose existing lines already fit. Increasing width from `30` to `80` therefore fills wider lines; decreasing it wraps them more narrowly. Leave already canonical wrapping unchanged. Count indentation, quote/list/footnote prefixes, and inline Markdown syntax in the source width, not rendered text width. Match upstream's documented implementation convention: Unicode display width with four-column tab stops, while preserving original UTF-16 offsets for ESLint fixes.
-
-Keep the existing `width` diagnostics for overlong lines. When all lines fit but a proven safe reflow would change the segment, report one fixable `reflow` diagnostic at its first line. Do not invent a reflow diagnostic when a safe correction cannot be established; overlong lines still report without a fix when unsafe or impossible to correct.
-
-Do not split words, URLs, link/image syntax, inline code, or other indivisible constructs to satisfy a width. URLs do not exempt surrounding prose from wrapping. If an atomic construct cannot fit, retain a diagnostic without an unsafe or endlessly repeated fix.
-
-Preserve two-space and backslash hard breaks, and case-insensitive `<br>`, `<br/>`, and `<br />` at either side of a source-line boundary. Do not interpret an escaped tag or a tag inside inline code as HTML. Keep hard-break spelling and boundaries unchanged and process the remaining soft-wrapped segments independently.
-
-Leave headings, tables, code blocks, HTML blocks, parsed front matter, link definitions, and math blocks alone. This promise depends on the selected parser recognizing those constructs: document the required front-matter/math language options, and do not claim unsupported dialect syntax is automatically protected.
-
-Remove only proven continuation indentation and container prefixes when joining. Preserve first-line markers, task checkboxes, list numbering, blockquote nesting, paragraph boundaries, blank lines, and LF/CRLF style. New numeric-wrap lines must use valid continuation prefixes, never repeated list-item markers.
-
-Report without fixing when safety cannot be established, including multiline literals, ambiguous indentation, directive boundaries, unknown extension syntax, mixed line endings in an edited segment, or a proposed line break that would create a heading, list, blockquote, thematic break, code block, or HTML block. No whole-document serialization or unrelated whitespace cleanup.
+Preserve intentional two-space, backslash, and HTML hard breaks, inline spelling and literals, paragraph boundaries, container markers, line endings, and final-newline state. Process segments between hard breaks independently.
 
 ## Integration and Implementation
 
-The rule uses the host's paragraph AST, source ranges, ancestry, and original source text. It traverses public AST children rather than importing upstream internal helpers. One rule contains local helpers for display width, segments, proven container prefixes, whitespace boundaries, greedy numeric reflow, and safe edits.
+`src/index.js` exports the plugin; `src/rules/wrap.js` uses public Markdown AST children, original source text, and localized replacement ranges. Numeric mode reports overlong lines as `width` and safe reflow of otherwise compliant lines as `reflow`.
 
-ESLint's public rule context exposes language options but not the active language object or dialect name. The implementation therefore finds the public `@eslint/markdown` languages whose parses reproduce the original document AST, then requires each proposed edit to preserve that AST under every matching language. It normalizes only soft-break whitespace in text values and discards positions; literal values, inline syntax, hard breaks, and block structure must remain equal. It does not inspect other rules' configuration or import an internal parser.
+ESLint does not expose the active Markdown dialect through the rule context. Find every public Markdown language whose parse matches the original AST, then require each proposed edit to preserve the normalized AST under all matching languages. Ignore positions and soft-break whitespace during comparison, but preserve literals, inline syntax, hard breaks, and block structure.
 
-This deliberately favors safety over fixing coverage. If no public dialect matches the original AST, diagnostics remain report-only throughout the file. Standard syntax under the optional extended language can be fixed when it matches; custom containers and other unmatched extension nodes are report-only. Multiline literals, inline comments, directive-boundary patterns, tab-indented prefixes, and ambiguous edited line endings also prevent fixes. A numeric segment containing an overlong atomic construct receives no partial reflow because the whole proposed correction must be compliant and stable.
+If no dialect matches, or safety cannot be established, report without fixing. Ambiguous indentation, multiline literals, directives, unmatched extensions, mixed line endings in an edited segment, and syntax-changing break points prevent fixes. Fixes must not overlap and must stabilize on the next pass. AST equivalence is not a guarantee that every renderer treats soft breaks identically.
 
-Both source/API and packaged CLI file fixtures provide behavioral safety evidence. AST equivalence alone is not proof that every renderer treats soft line breaks identically.
+## Data-Driven File Fixtures
 
-Fixes must be non-overlapping and stabilize on a subsequent ESLint pass. A segment that cannot be made compliant safely remains report-only. Use deterministic diagnostics and localized replacement ranges.
+Each directory under `test/fixtures/integration/` contains `case.json`, `input.md`, `expected.md`, and `diagnostics.json`. Metadata selects language, options, and optional integration settings; expected files preserve exact bytes rather than deriving them from the implementation.
 
-### Dependencies and Layout
+Shared API and packaged CLI runners check diagnostics and exit status, run `--fix`, compare expected bytes, then run `--fix` again to verify stability. Report-only cases retain their original bytes and lint errors. Preserve intentional line endings through `.gitattributes` and keep invalid fixtures outside documentation linting.
 
-Use JavaScript ESM, npm with a committed `package-lock.json`, and `node --test`. The package has `src/index.js`, `src/rules/wrap.js`, `test/`, shared test support under `test-support/`, and integration file fixtures. Public exports and an explicit packaged-file list exclude development support from the archive.
+The consumer suite inspects and installs the actual npm archive in a temporary project and imports its public exports, never the source checkout. `PARAGRAPH_WRAP_PACKAGE_ARCHIVE` selects the exact archive prepared for release. See [Contributing](CONTRIBUTING.md) for commands and coverage expectations.
 
-Registry checks currently report ESLint `10.14.0`, `@eslint/markdown` `8.0.3`, `eslint-plugin-markdown-preferences` `0.43.0`, and `string-width` `8.3.0`; the Node distribution index reports Node `26.13.0` as the latest stable release and LTS. These are research observations, not permanent pins; recheck stable versions during scaffolding.
+## Development Tooling
 
-Use ESLint `^9.39.0 || ^10.0.0` and `@eslint/markdown ^8.0.0` as peer dependencies, with `string-width` as a direct runtime dependency. `eslint-plugin-markdown-preferences` is a development dependency for coexistence/extended-syntax integration tests; consumers need it only for those optional integrations. Supported Node versions start at `^22.13.0 || >=24.0.0`, matching the selected host's minimum on the supported Node 22 line rather than adding the older Node 20 line solely because upstream still allows it. Test the minimum supported Node version and the latest stable development runtime, plus both supported ESLint major versions. Use Node.js `26.13.0` for development; documentation spelling tools require at least Node.js 22.18.
+Development uses ESLint for JavaScript, embedded examples, and Markdown. `@eslint/markdown` handles structure and code blocks; `eslint-plugin-markdown-preferences` handles style and title case; this plugin enforces `width: "nowrap"`. Markdown-source and embedded-code checks use separate invocations.
 
-Development linting uses ESLint throughout JavaScript and Markdown. `@eslint/markdown` checks document structure and processes embedded JavaScript; `eslint-plugin-markdown-preferences` supplies Markdown style and title-case checks; this package's public export enforces single-line prose with `width: "nowrap"`. The historical Markdownlint tools in the inventory above are research references, not installed dependencies or active checks. Markdown-source linting and code-block processor linting use separate ESLint invocations because applying the processor replaces the original Markdown input. A small tested YAML-aware checker enforces title case for workflow/job/step display names without checking machine identifiers or arbitrary `name` fields. Test, Lint, and Package workflows remain separate, with coverage and Coveralls.
+`eslint-plugin-prose-spellcheck` checks visible prose with offline US English, software terminology, and `.spellcheck.txt` dictionaries resolved relative to the Markdown configuration. It preserves source offsets and supplies no spelling fixes. Local rules enforce the first level-one heading and final newline; a YAML-aware checker validates workflow display names.
 
-Native Markdown spelling uses a local ESLint rule backed by public `cspell-lib` dictionary and text-extraction APIs, with US English, software terminology, and the existing `.spellcheck.txt` vocabulary. CSpell's ESLint plugin currently visits only JavaScript `Program` nodes, so enabling it on the Markdown AST would silently skip prose. The native rule checks text nodes rather than URLs or inline/fenced code, preserves original UTF-16 source offsets, and never rewrites spelling or mutates third-party rules/ASTs. Two small native rules retain first-level-one-heading and final-newline checks; comments and standalone logo images may precede the heading. HTML allowances are limited to `img` elements. The style configuration keeps the prior allowance for both Markdown hard-break forms and unaligned table columns.
-
-Documentation file fixtures load the actual Markdown and embedded-code ESLint configs and verify valid/invalid headings, spelling and Unicode locations, public `wrap` fixes, structural errors, final-newline fixes, ignored test fixtures, and literal/code exclusions. These development-tool checks require Node 22.18 or later, independently of the package's lower runtime minimum.
+Test, Lint, and Package workflows remain separate. Compatibility tests cover the public Node and ESLint requirements; development spelling requires a newer host as documented in [Contributing](CONTRIBUTING.md). Coverage uses Coveralls.
 
 ## Release Automation
 
-A manually dispatched GitHub Actions workflow uses development-only `release-it` for version updates, Git commits/tags/pushes, npm trusted publishing, and GitHub Release creation. Project hooks retain the existing handwritten changelog format and validate the exact artifact. Dispatch releases the checked-in stable version unless an explicit stable-version override is supplied. It does not infer versions from conventional commits or publish on merges, and it has no dry-run input.
+Only a manual dispatch requests publication. Development-only `release-it` manages versions, Git operations, npm OIDC publishing, and GitHub Releases; project hooks format the changelog and validate the exact archive, metadata, remote references, and registry integrity.
 
-Release-it 21.1.2 supports the release runtime but its proxy chain selects an outdated FTP client. A scoped `get-uri` override selects stable `basic-ftp` 6.2.6 to address the reported directory-listing denial of service; its public Client methods used by `get-uri` are retained. This release workflow uses HTTPS, not FTP. Recheck and remove the override when the upstream dependency includes the fix.
-
-The hooks reject dirty checkouts, mismatched metadata, empty notes, existing registry versions/tags, unexpected file changes, and concurrent default-branch updates. They pack once to `.release/package.tgz` and run the existing real CLI consumers against that exact archive; `npm.publishPath` lets release-it publish the retained file without replacing it. `npm.skipChecks` avoids token-based authentication checks that cannot validate OIDC. The native flow publishes npm first, then commits/tags and atomically pushes Git without force. A pre-GitHub-Release hook verifies the remote commit/tag and registry integrity, because release-it can report a Git push failure without throwing after npm succeeds.
-
-The clean-check hook replaces `git.requireCleanWorkingDir`, disabling native source-reset and local-tag rollback handlers without allowing a dirty starting checkout. Successful native npm publication prevents release-it from attempting remote-tag rollback on a failed Git push; the next-version run disables tagging altogether. Failures retain the archive, checksum, and metadata patch in Actions artifacts rather than maintaining custom state or Git bundles. Never roll back published packages or delete release tags.
-
-After successful npm publication and GitHub Release creation, a second release-it run increments patch, opens a new Next section through its changelog hook, runs tests and lint against that next version, and commits/pushes its metadata. This run disables npm publication, GitHub Releases, and Git tags; it does not repeat the release hooks. Ordinary development remains PR-based. The explicitly approved no-App setup allows direct default-branch pushes for all repository writers while retaining force-push/deletion protections; the release environment is restricted to `master`. See [Releasing](RELEASING.md) for the one-time npm bootstrap, trusted-publisher configuration, invocation, and failure recovery.
-
-## Acceptance Tests
-
-| Area | Required Evidence |
-| --- | --- |
-| Modes and schema | Wrap/unwrap/ignore with the same width across root and nested paragraphs; invalid settings, including container-specific options and `ignoreUrls`, rejected; opt-in activation. |
-| Containers | Ordered/unordered and task lists, nested quotes/lists, lazy continuations, loose paragraphs, and footnotes under a supporting language; markers and structure unchanged. |
-| Breaks and inline syntax | Both Markdown hard-break forms; HTML breaks on either side of a boundary; escaped tags/backslashes; links, images, emphasis, inline code, Unicode, and literal content. |
-| Numeric limits | Prefix-inclusive widths, tabs and wide/combining characters; prose wraps around intact URLs; overlong indivisible URLs and other constructs report without fixes; widening and narrowing reflow existing wrapping; canonical paragraphs unchanged; no partial-fix loops. |
-| Conservative fixes | Multiline literals, directive boundaries, ambiguous indentation, unknown extensions, and syntax-changing split points produce diagnostics without unsafe edits. |
-| Exclusions and stability | Non-paragraph blocks unchanged; configured front matter and math; LF/CRLF preservation; no fix overlap; a second fix pass makes no further changes. |
-| Real integration | ESLint CLI check and `--fix` with CommonMark/GFM, optional extended syntax, inline disable comments, and actual `max-len` coexistence configuration. |
-| Packaged consumer | Install the actual `npm pack` artifact in an owned temporary consumer; import public exports and run ESLint against fixtures without source-tree dependencies. |
-
-### Data-Driven File Fixtures
-
-Drive integration tests from checked-in fixture directories rather than Markdown strings embedded in test code. Each directory is one named case, discovered in sorted order by a shared `node --test` runner:
-
-```text
-test/fixtures/integration/
-  nowrap-list/
-    case.json
-    input.md
-    expected.md
-    diagnostics.json
-  numeric-url/
-    case.json
-    input.md
-    expected.md
-    diagnostics.json
-```
-
-`case.json` declares the language (`commonmark`, `gfm`, or optional `extended-syntax`), language options, rule options, and whether to enable the existing `max-len` coexistence configuration. Optional metadata selects severity, an `.md`/`.markdown` consumer filename, or expected configuration failure. The shared loader validates metadata and diagnostic fields so misspellings cannot silently skip coverage. Run each case under its declared dialect; do not indiscriminately apply GFM fixtures to CommonMark.
-
-`input.md` is the original file; `expected.md` is the exact file after fixing. For valid and report-only cases, expected output is identical to input. Check in expected bytes rather than deriving them from the implementation. `diagnostics.json` records expected diagnostics before and after fixing using message ID, start line/column, and fix availability; optional rule ID/severity override defaults of this plugin's rule and error severity. Do not snapshot temporary absolute paths, raw fix ranges, or unrelated CLI metadata.
-
-The CLI runner inspects and installs the actual packed plugin in an owned temporary consumer with the matrix-selected ESLint and matching host versions. It generates flat configuration from fixture metadata using public plugin exports. It reuses that installation across cases but copies each input into an isolated case directory before invoking the real ESLint CLI. It never runs `--fix` against checked-in fixtures or imports the plugin from the source checkout. A separate public-API runner exercises the same fixtures against source for focused checks and coverage. Process invocations use argument arrays and capture output and exit status.
-
-For every case, run a check with JSON output and compare diagnostics and the expected success/failure status. Then run `--fix`, compare the resulting Markdown byte-for-byte with `expected.md`, and compare remaining diagnostics. Finally run `--fix` again and assert unchanged bytes and diagnostics. Report-only cases may still exit with lint errors; that is expected, not a runner failure. Assert that check-only invocations leave files unchanged.
-
-Start with fixtures covering root prose, ordered/unordered/task lists, nested quotes and lists, footnotes, hard-break segments, inline markup and literals, URL-adjacent prose and overlong URLs, numeric split points that would change parsing, ignored widths, excluded blocks, inline disable comments, and `max-len` coexistence. Add invalid-option cases with expected configuration failure and unchanged input, without depending on full ESLint error wording. Exercise Unicode and tabs in file fixtures, not only helper unit tests.
-
-Include LF and CRLF cases and a missing-final-newline case. Preserve fixture bytes with narrowly targeted `.gitattributes` entries such as `-text` for CRLF and mixed-ending fixtures so Git checkout cannot invalidate the line-ending assertions. Mixed-ending edits that cannot be proven safe should remain report-only. Keep intentionally invalid fixtures out of project documentation linting without excluding normal documentation.
-
-Use focused helper tests only for behavior that cannot be expressed clearly through file fixtures. New end-to-end behavior should normally require adding or updating a fixture, not adding a case-specific branch to the runner. Fixture failures must identify the case and phase and show a concise diagnostic or file diff.
+Publish the tested archive, atomically push the release commit and tag, create the GitHub Release, then validate and push the next development patch. Keep the README installation pin at the released version. Failures retain the archive, checksum, and metadata patch; never blindly republish, overwrite versions, delete release tags, or reset source changes. See [Releasing](RELEASING.md) for setup, authorization, and recovery.
 
 ## Logo
 
-[`assets/logo.svg`](assets/logo.svg) is original artwork created by GitHub Copilot for this project from the approved notepad-and-wrap-arrow concept, refined to a softer pale blue palette with a thin border. It uses the project's [MIT license](LICENSE); no third-party logos, fonts, or images were adapted.
+[`assets/logo.svg`](assets/logo.svg) is original GitHub Copilot artwork under the project's [MIT license](LICENSE), with no adapted third-party assets. The SVG is both the editable source and README display asset: a pale blue notepad with a returning wrap arrow on a transparent 256-by-256 canvas.
 
-The SVG is both the editable source and the README display asset. Its transparent 256-by-256 canvas contains a pale blue notepad, a lightly shaded folded corner, a thin blue border, and muted blue paragraph lines with a returning wrap arrow. The README places it above the title at 160 pixels wide, with descriptive alternative text and blank lines separating the logo, title, and badges.
-
-Edit the SVG paths and colors directly; no generator, font, or raster conversion is required. Preserve the view box, accessible title/description, transparent background, and clear geometry at the README display size. Keep previews outside the package and repository. Inspect the full-size SVG and rendered README at 160 pixels on light and dark backgrounds for legibility and clipping; run `npm run lint` and `npm test`. The packed-consumer suite verifies that the exact editable logo is installed with the README.
-
-## Scope and Review Gates
-
-The first implementation includes numeric wrapping and `"nowrap"` together, one width policy for all paragraphs, safe fixes, documentation, and real host/package tests. Non-goals are container-specific policies, upstream deprecation work, a full Markdown formatter, semantic sentence wrapping, MDX or arbitrary renderer support, and automatic cross-rule conflict resolution.
-
-The agreed first-version scope combines numeric wrapping and `"nowrap"`, with no checks when `width` is omitted, no container-specific options, and no URL exemptions. The scaffold PR has merged, and this implementation is the next focused PR.
-
-Validate and open the implementation PR from its separate worktree, then pause for explicit approval. No additional merging, publication, release tags, or artwork is authorized.
+Keep the logo above the README title at 160 pixels, with descriptive alternative text. Edit the SVG directly and preserve its view box, accessible title and description, and transparent background. Inspect full-size and README-size rendering on light and dark backgrounds; keep previews outside the repository. Packed-consumer tests verify that the editable logo is included.
