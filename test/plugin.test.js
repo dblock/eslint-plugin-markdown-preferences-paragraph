@@ -21,7 +21,7 @@ for (const fixture of await fixtures()) {
       return;
     }
     const [before] = await eslint.lintText(input, { filePath });
-    assert.deepEqual(diagnostics(before.messages), fixture.diagnostics.before);
+    assert.deepEqual(diagnostics(before.messages, fixture.diagnostics.before), fixture.diagnostics.before);
     const fixer = new ESLint({
       overrideConfigFile: true,
       overrideConfig: [configuration(fixture.metadata, { markdown, preferences, plugin })],
@@ -30,9 +30,9 @@ for (const fixture of await fixtures()) {
     const [after] = await fixer.lintText(input, { filePath });
     const output = after.output ?? input;
     assert.equal(output, fixture.expected.toString("utf8"));
-    assert.deepEqual(diagnostics(after.messages), fixture.diagnostics.after);
+    assert.deepEqual(diagnostics(after.messages, fixture.diagnostics.after), fixture.diagnostics.after);
     const [stable] = await fixer.lintText(output, { filePath });
     assert.equal(stable.output ?? output, output);
-    assert.deepEqual(diagnostics(stable.messages), fixture.diagnostics.after);
+    assert.deepEqual(diagnostics(stable.messages, fixture.diagnostics.after), fixture.diagnostics.after);
   });
 }

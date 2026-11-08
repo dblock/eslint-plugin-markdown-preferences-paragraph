@@ -1,0 +1,14 @@
+{
+  "before": [
+    { "messageId": "maxWords", "message": "Paragraph has 3 words; maximum is 2.", "line": 1, "column": 3, "fixable": false },
+    { "messageId": "maxWords", "message": "Paragraph has 3 words; maximum is 2.", "line": 3, "column": 3, "fixable": false },
+    { "messageId": "maxWords", "message": "Paragraph has 3 words; maximum is 2.", "line": 7, "column": 7, "fixable": false },
+    { "messageId": "maxWords", "message": "Paragraph has 3 words; maximum is 2.", "line": 9, "column": 4, "fixable": false }
+  ],
+  "after": [
+    { "messageId": "maxWords", "message": "Paragraph has 3 words; maximum is 2.", "line": 1, "column": 3, "fixable": false },
+    { "messageId": "maxWords", "message": "Paragraph has 3 words; maximum is 2.", "line": 3, "column": 3, "fixable": false },
+    { "messageId": "maxWords", "message": "Paragraph has 3 words; maximum is 2.", "line": 7, "column": 7, "fixable": false },
+    { "messageId": "maxWords", "message": "Paragraph has 3 words; maximum is 2.", "line": 9, "column": 4, "fixable": false }
+  ]
+}

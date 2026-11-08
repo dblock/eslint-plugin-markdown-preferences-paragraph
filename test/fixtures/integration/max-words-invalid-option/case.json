@@ -1,0 +1,1 @@
+{ "language": "gfm", "rule": "max-words", "options": { "max": 3, "width": 80 }, "configurationError": true }

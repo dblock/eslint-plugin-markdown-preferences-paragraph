@@ -1,0 +1,1 @@
+{ "language": "commonmark", "rule": "max-words", "options": { "max": "ignore" }, "configurationError": true }

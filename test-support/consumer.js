@@ -23,6 +23,7 @@ export async function consumer(archivePath = process.env.PARAGRAPH_WRAP_PACKAGE_
       .trim().split("\n").map((path) => path.replace(/^package\//u, ""))
       : archive.files.map((file) => file.path);
     assert.ok(paths.includes("src/rules/wrap.js"));
+    assert.ok(paths.includes("src/rules/max-words.js"));
     assert.ok(paths.includes("LICENSE"));
     assert.ok(paths.includes("assets/logo.svg"), "The README logo must be packaged.");
     assert.ok(paths.every((path) =>
@@ -98,7 +99,7 @@ export default [configuration(${JSON.stringify(fixture.metadata)}, { markdown, p
           );
           const [lintResult] = JSON.parse(result.stdout);
           assert.deepEqual(
-            diagnostics(lintResult.messages), fixture.diagnostics[phase],
+            diagnostics(lintResult.messages, fixture.diagnostics[phase]), fixture.diagnostics[phase],
             `${fixture.name}: ${phase}: diagnostics`,
           );
         }

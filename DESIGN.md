@@ -2,11 +2,11 @@
 
 ## Purpose
 
-`eslint-plugin-markdown-preferences-paragraph` checks and safely fixes Markdown paragraph wrapping. It is not a general formatter, replacement parser, or rendered-text layout tool.
+`eslint-plugin-markdown-preferences-paragraph` checks Markdown paragraph wrapping and word counts, with conservative wrapping fixes. It is not a general formatter, replacement parser, or rendered-text layout tool.
 
 ## Public API
 
-The ESM plugin exports `meta` and `rules.wrap`. Register it as `paragraph` to configure `paragraph/wrap`; see [README](README.md) for installation and examples.
+The ESM plugin exports `meta`, `rules.wrap`, and `rules["max-words"]`. Register it as `paragraph`; see [README](README.md) for installation and examples.
 
 | Width | Behavior |
 | --- | --- |
@@ -15,6 +15,8 @@ The ESM plugin exports `meta` and `rules.wrap`. Register it as `paragraph` to co
 | Positive integer | Greedily reflow safe segments to that source width, including widening existing short lines. |
 
 One width applies to every paragraph, including supported lists, blockquotes, and footnotes. Invalid widths, unknown options, container-specific settings, and URL exemptions are rejected. There is no automatically enabled preset.
+
+`paragraph/max-words` accepts an explicit positive integer `max`; omission leaves paragraphs unchecked. Count prose and link labels using `Intl.Segmenter` with English word segmentation, including numbers but excluding punctuation, emoji, code, images, footnote markers, destinations, and titles. Formatting contributes its text; HTML tags are ignored and hard breaks separate words. Limits apply to whole paragraphs, independently of source wrapping. Report the count and maximum without fixes or suggestions.
 
 Existing paragraph-length rules and formatters must use compatible policies. The plugin does not inspect or change their configuration.
 
@@ -30,13 +32,15 @@ Preserve intentional two-space, backslash, and HTML hard breaks, inline spelling
 
 `src/index.js` exports the plugin; `src/rules/wrap.js` uses public Markdown AST children, original source text, and localized replacement ranges. Numeric mode reports overlong lines as `width` and safe reflow of otherwise compliant lines as `reflow`.
 
+`src/rules/max-words.js` reads paragraph text through public AST children and reports at the paragraph's original location. Joining text through formatting preserves words split by markup; excluded code, images, and references form word boundaries.
+
 ESLint does not expose the active Markdown dialect through the rule context. Find every public Markdown language whose parse matches the original AST, then require each proposed edit to preserve the normalized AST under all matching languages. Ignore positions and soft-break whitespace during comparison, but preserve literals, inline syntax, hard breaks, and block structure.
 
 If no dialect matches, or safety cannot be established, report without fixing. Ambiguous indentation, multiline literals, directives, unmatched extensions, mixed line endings in an edited segment, and syntax-changing break points prevent fixes. Fixes must not overlap and must stabilize on the next pass. AST equivalence is not a guarantee that every renderer treats soft breaks identically.
 
 ## Data-Driven File Fixtures
 
-Each directory under `test/fixtures/integration/` contains `case.json`, `input.md`, `expected.md`, and `diagnostics.json`. Metadata selects language, options, and optional integration settings; expected files preserve exact bytes rather than deriving them from the implementation.
+Each directory under `test/fixtures/integration/` contains `case.json`, `input.md`, `expected.md`, and `diagnostics.json`. Metadata selects language, rule (`wrap` by default), options, and optional integration settings; expected files preserve exact bytes rather than deriving them from the implementation. Optional diagnostic messages verify word counts and limits.
 
 Shared API and packaged CLI runners check diagnostics and exit status, run `--fix`, compare expected bytes, then run `--fix` again to verify stability. Report-only cases retain their original bytes and lint errors. Preserve intentional line endings through `.gitattributes` and keep invalid fixtures outside documentation linting.
 

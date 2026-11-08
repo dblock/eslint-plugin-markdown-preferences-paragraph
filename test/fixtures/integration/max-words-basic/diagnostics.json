@@ -1,0 +1,8 @@
+{
+  "before": [
+    { "messageId": "maxWords", "message": "Paragraph has 4 words; maximum is 3.", "line": 3, "column": 1, "fixable": false }
+  ],
+  "after": [
+    { "messageId": "maxWords", "message": "Paragraph has 4 words; maximum is 3.", "line": 3, "column": 1, "fixable": false }
+  ]
+}

@@ -4,7 +4,7 @@
 
 [![Test](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/test.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/test.yml) [![Lint](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/lint.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/lint.yml) [![Package](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/package.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/package.yml) [![Coverage](https://coveralls.io/repos/github/dblock/eslint-plugin-markdown-preferences-paragraph/badge.svg?branch=master)](https://coveralls.io/github/dblock/eslint-plugin-markdown-preferences-paragraph?branch=master)
 
-An ESLint plugin for checking and safely fixing Markdown paragraph wrapping, inspired by [eslint-plugin-markdown-preferences#338](https://github.com/ota-meshi/eslint-plugin-markdown-preferences/issues/338).
+An ESLint plugin for checking Markdown paragraph wrapping and word counts, with conservative wrapping fixes, inspired by [eslint-plugin-markdown-preferences#338](https://github.com/ota-meshi/eslint-plugin-markdown-preferences/issues/338).
 
 ## Installation
 
@@ -40,7 +40,9 @@ npx eslint "**/*.md"
 
 ## Configuration
 
-The rule accepts one option, `width`:
+### Paragraph Wrapping
+
+`paragraph/wrap` accepts one option, `width`:
 
 | Value | Behavior |
 | --- | --- |
@@ -52,6 +54,20 @@ The rule accepts one option, `width`:
 One width policy applies to every paragraph, including paragraphs in lists, blockquotes, and GFM footnotes. There are no container-specific widths, URL exemptions, or recommended presets.
 
 Numeric widths include source markup and container prefixes, Unicode display width, and four-column tab stops.
+
+### Paragraph Word Limits
+
+Set a positive integer `max` to report paragraphs exceeding that word count:
+
+```json
+{
+  "paragraph/max-words": ["error", { "max": 200 }]
+}
+```
+
+Omitting `max`, including an empty options object, does nothing. The limit applies to the whole paragraph in any supported container, independently of wrapping and hard breaks. Diagnostics include the actual count and maximum; this rule never fixes or suggests where to split prose.
+
+Count prose and link labels with Unicode-aware English word segmentation. Numbers count as words; punctuation and emoji do not. Inline formatting and decoded entities contribute their text, not their markup. Markdown code, images, footnote markers, link destinations, and titles do not count. HTML tags do not count, and hard breaks separate words.
 
 ## Fixing
 
@@ -83,7 +99,7 @@ With the plugin registered as `markdownPreferences`, configure `max-len` to skip
 }
 ```
 
-### [markdownlint](https://github.com/DavidAnson/markdownlint)
+### [`markdownlint`](https://github.com/DavidAnson/markdownlint)
 
 Disable markdownlint `MD013` when enforcing unrestricted `"nowrap"`. In `.markdownlint.json`:
 

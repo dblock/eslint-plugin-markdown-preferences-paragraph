@@ -1,6 +1,6 @@
 # Contributing
 
-Read [Design](DESIGN.md) and [Automated Contributor Instructions](AGENTS.md). The rule supports numeric wrapping and unwrapping through one paragraph-wide policy.
+Read [Design](DESIGN.md) and [Automated Contributor Instructions](AGENTS.md). The rules support numeric wrapping, unwrapping, and report-only word limits through explicit paragraph-wide policies.
 
 ## Setup and Validation
 
