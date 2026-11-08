@@ -2,23 +2,38 @@
 
 Use **Actions > Release > Run workflow** on `master`. A dispatch requests a real release; there is no dry-run input. Opening or merging the workflow setup PR does not authorize publication. Finish the one-time setup and review the candidate before dispatching.
 
-## One-time Setup
+## Trusted Publishing
 
-The package is initially unpublished. npm requires an existing package before its trusted publisher can be configured, unlike RubyGems pending publishers. The approved bootstrap uses npm staged publishing: stage a separate `0.0.1-bootstrap` candidate to establish the public `0.0.0-stage` placeholder on npm, then configure the trusted publisher and run the normal workflow for the real `0.1.0` release. This keeps changelog, tag, GitHub Release, and next-version preparation in release-it rather than creating bootstrap metadata PRs.
+The package is already published on npm. Releases use the configured GitHub Actions trusted publisher; no bootstrap, staging, or stored npm token is needed.
 
-Use npm 11.15.0 or later for staging and trusted-publisher configuration, with a compatible Node version. Log in and complete account-level 2FA locally; never share credentials. Prepare the bootstrap tarball from an isolated copy with version `0.0.1-bootstrap`, leaving tracked package and lockfile versions at `0.1.0`, then stage it:
+The connection in **Package > Settings > Trusted Publisher** must match:
+
+| Setting | Value |
+| --- | --- |
+| Publisher | GitHub Actions |
+| Organization or User | `dblock` |
+| Repository | `eslint-plugin-markdown-preferences-paragraph` |
+| Workflow Filename | `release.yml` |
+| Environment | `release` |
+| Direct Publishing | Enabled: `npm publish` |
+
+Use npm 11.15.0 or later with a compatible Node version to configure or inspect the connection. Complete browser 2FA locally; never share codes or tokens. If the connection is missing, create it with:
 
 ```sh
-npm stage publish .release/eslint-plugin-markdown-preferences-paragraph-0.0.1-bootstrap.tgz --access public --tag bootstrap
+npm trust github eslint-plugin-markdown-preferences-paragraph \
+  --repo dblock/eslint-plugin-markdown-preferences-paragraph \
+  --file release.yml --env release --allow-publish
 ```
 
-Keep the bootstrap stage pending until the real `0.1.0` release succeeds. Do not stage `0.1.0`: staged and published versions share the same unique version index. Do not approve the bootstrap candidate or reject it before the real release exists; rejecting the only stage can remove the placeholder and trigger the 24-hour npm unpublish lock.
+Verify the repository, filename, environment, and direct-publish permission:
 
-Create an npm trusted publisher at **Package > Settings > Trusted Publisher** with owner `dblock`, repository `eslint-plugin-markdown-preferences-paragraph`, workflow filename `release.yml`, and environment `release`. Explicitly allow direct `npm publish`, not only staged publication; staged approval requires a human and is not this workflow. Create the connection just before its first automated release: a new connection expires if its first successful publish does not happen within two days.
+```sh
+npm trust list eslint-plugin-markdown-preferences-paragraph
+```
+
+Stage-only permission is insufficient: this workflow publishes directly and does not wait for human approval of a staged package. A new connection must complete its first successful publish within two days or expire. Recreate an expired connection before an authorized release; configuration alone does not prove that OIDC publication succeeds.
 
 The GitHub `release` environment is configured for only `master`, without required reviewers. Writers can dispatch releases; add maintainer reviewers if approval before publication is desired. The approved no-App setup removes the default branch's PR requirement, allowing all writers to push directly, while preserving active force-push and deletion protections without bypass actors. Ordinary development must still use PRs.
-
-After verifying the real release, reject the pending bootstrap stage with `npm stage reject <stage-id>`. Do not unpublish the public placeholder or the released package.
 
 The workflow uses Node 26.13.0 and requires npm 11.5.1 or later. It uses the built-in `GITHUB_TOKEN` for Git and GitHub Releases, with `contents: write` and `id-token: write`. No GitHub App, stored npm token, or `NODE_AUTH_TOKEN` is needed. npm automatically supplies provenance for this public package and repository.
 
