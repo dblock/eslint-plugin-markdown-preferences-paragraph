@@ -52,7 +52,7 @@ Development uses ESLint for JavaScript, embedded examples, and Markdown. `@eslin
 
 `eslint-plugin-prose-spellcheck` checks visible prose with offline US English, software terminology, and `.spellcheck.txt` dictionaries resolved relative to the Markdown configuration. It preserves source offsets and supplies no spelling fixes. Local rules enforce the first level-one heading and final newline; a YAML-aware checker validates workflow display names.
 
-Test, Lint, and Package workflows remain separate. Compatibility tests cover the public Node and ESLint requirements; development spelling requires a newer host as documented in [Contributing](CONTRIBUTING.md). Coverage uses Coveralls.
+Test, Lint, and Package workflows remain separate. Compatibility tests cover the public Node and ESLint requirements; spelling supports both ESLint majors but requires a newer Node runtime as documented in [Contributing](CONTRIBUTING.md). Coverage uses Coveralls.
 
 ## Release Automation
 
