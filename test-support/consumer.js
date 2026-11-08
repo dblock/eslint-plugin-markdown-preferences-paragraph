@@ -22,7 +22,7 @@ export async function consumer(archivePath = process.env.PARAGRAPH_WRAP_PACKAGE_
     const paths = archivePath ? execFileSync("tar", ["-tzf", archivePath], { encoding: "utf8" })
       .trim().split("\n").map((path) => path.replace(/^package\//u, ""))
       : archive.files.map((file) => file.path);
-    assert.ok(paths.includes("src/rules/paragraph-wrap.js"));
+    assert.ok(paths.includes("src/rules/wrap.js"));
     assert.ok(paths.includes("LICENSE"));
     assert.ok(paths.includes("assets/logo.svg"), "The README logo must be packaged.");
     assert.ok(paths.every((path) =>

@@ -34,7 +34,7 @@ export default [
           "First-Version", "Data-Driven",
         ],
       }],
-      "paragraph/paragraph-wrap": ["error", { width: "nowrap" }],
+      "paragraph/wrap": ["error", { width: "nowrap" }],
       "documentation/spelling": "error",
       "documentation/first-heading": "error",
       "documentation/final-newline": "error",
