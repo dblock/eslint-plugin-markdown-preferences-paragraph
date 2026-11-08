@@ -1,16 +1,15 @@
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 
-const ruleId = "paragraph/wrap";
-
-export function diagnostics(messages) {
-  return messages.map((message) => ({
+export function diagnostics(messages, expected = []) {
+  return messages.map((message, index) => ({
     ruleId: message.ruleId,
     messageId: message.messageId,
     severity: message.severity,
     line: message.line,
     column: message.column,
     fixable: Boolean(message.fix),
+    ...(expected[index]?.message === undefined ? {} : { message: message.message }),
   }));
 }
 
@@ -26,11 +25,12 @@ export async function fixtures() {
     const metadata = JSON.parse(await readFile(new URL("case.json", directory), "utf8"));
     for (const key of Object.keys(metadata)) {
       assert.ok([
-        "language", "languageOptions", "options", "severity",
+        "language", "languageOptions", "options", "severity", "rule",
         "coexistence", "configurationError", "fileName",
       ].includes(key), `${name}: unknown metadata field ${key}`);
     }
     assert.ok(["commonmark", "gfm", "extended-syntax"].includes(metadata.language), name);
+    assert.ok(["wrap", "max-words"].includes(metadata.rule ?? "wrap"), name);
     assert.ok(["error", "warn", "off"].includes(metadata.severity ?? "error"), name);
     assert.match(metadata.fileName ?? "input.md", /^input\.(?:md|markdown)$/u);
     for (const key of ["coexistence", "configurationError"]) {
@@ -49,14 +49,15 @@ export async function fixtures() {
       expectedDiagnostics[phase] = expectedDiagnostics[phase].map((message) => {
         for (const key of Object.keys(message)) {
           assert.ok([
-            "ruleId", "messageId", "severity", "line", "column", "fixable",
+            "ruleId", "messageId", "severity", "line", "column", "fixable", "message",
           ].includes(key), `${name}: unknown diagnostic field ${key}`);
         }
         assert.equal(typeof message.messageId, "string", name);
         assert.ok(Number.isInteger(message.line) && message.line > 0, name);
         assert.ok(Number.isInteger(message.column) && message.column > 0, name);
         assert.equal(typeof message.fixable, "boolean", name);
-        return { ruleId, severity: 2, ...message };
+        if ("message" in message) assert.equal(typeof message.message, "string", name);
+        return { ruleId: `paragraph/${metadata.rule ?? "wrap"}`, severity: 2, ...message };
       });
     }
     return {

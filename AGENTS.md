@@ -8,7 +8,9 @@ The `wrap` rule has one `width` option shared by every paragraph; omitting it sk
 
 Numeric widths enforce safe greedy reflow, not only a maximum line length. Changing the configured width must reflow existing shorter lines while preserving intentional hard-break boundaries; already canonical wrapping stays untouched.
 
-The plugin entry point is `src/index.js`, and the rule is `src/rules/wrap.js`. Tests live in `test/`, fixtures in `test/fixtures/integration/`, and shared test support in `test-support/`. Use public ESLint and Markdown language APIs, not upstream internal imports or global dependency mutation. Fixes must preserve source offsets, inline literals, hard breaks, container structure, and line endings, and stabilize on a second pass. Unsafe edits must remain report-only. Require AST equivalence under every public dialect matching the original document; do not guess the active language or rewrite unmatched extension syntax.
+The report-only `max-words` rule requires an explicit positive `max`. Count prose and link labels through the paragraph AST using English word segmentation; do not count code, images, footnote markers, destinations, or titles. Keep it independent of wrapping, and do not suggest paragraph boundaries or add fixes.
+
+The plugin entry point is `src/index.js`; rules live in `src/rules/wrap.js` and `src/rules/max-words.js`. Tests live in `test/`, fixtures in `test/fixtures/integration/`, and shared test support in `test-support/`. Use public ESLint and Markdown language APIs, not upstream internal imports or global dependency mutation. Fixes must preserve source offsets, inline literals, hard breaks, container structure, and line endings, and stabilize on a second pass. Unsafe edits must remain report-only. Require AST equivalence under every public dialect matching the original document; do not guess the active language or rewrite unmatched extension syntax.
 
 ## Setup and Validation
 
