@@ -43,13 +43,13 @@
     }
   },
   "devDependencies": {
+    "@cspell/dict-software-terms": "^5.4.9",
     "@eslint/js": "^10.0.1",
     "@eslint/markdown": "^8.0.3",
-    "@cspell/dict-software-terms": "^5.4.9",
     "c8": "^12.0.0",
     "eslint": "^10.14.0",
     "eslint-plugin-markdown-preferences": "^0.43.0",
-    "cspell-lib": "^10.4.1",
+    "eslint-plugin-prose-spellcheck": "0.1.0",
     "release-it": "^21.1.2",
     "title-case": "^4.3.2",
     "yaml": "^2.9.1"
