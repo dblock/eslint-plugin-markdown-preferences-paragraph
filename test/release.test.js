@@ -87,6 +87,9 @@ test("release hooks validate one archive and prepare the next version", { skip: 
       name: "release-fixture", version: "0.2.1", type: "module",
       repository: { type: "git", url: "git+https://github.com/example/release-fixture.git" },
     };
+    const released = "0.3.0";
+    const readme = `# Release Fixture\n\nnpm install --save-dev eslint @eslint/markdown eslint-plugin-markdown-preferences-paragraph-wrap@${manifest.version}\n`;
+    await writeFile(join(root, "README.md"), readme);
     await writeFile(join(root, "package.json"), JSON.stringify(manifest));
     await writeFile(join(root, "package-lock.json"), JSON.stringify({
       name: manifest.name, version: manifest.version, lockfileVersion: 3, packages: { "": manifest },
@@ -121,6 +124,8 @@ if (args[0] === "view") {
     "dist.integrity":"sha512-" + createHash("sha512").update("validated artifact").digest("base64")}));
 } else if (args[0] === "pack") {
   assert.ok(!existsSync(".release/package.tgz"), "Pack only once.");
+  assert.ok(readFileSync("README.md", "utf8").includes(
+    "eslint-plugin-markdown-preferences-paragraph-wrap@" + JSON.parse(readFileSync("package.json", "utf8")).version));
   writeFileSync(".release/fixture.tgz", "validated artifact");
   console.log(JSON.stringify([{filename:"fixture.tgz"}]));
 } else if (args[0] === "test") {
@@ -149,14 +154,17 @@ if (args[0] === "view") {
     execFileSync(process.execPath, [cli], {
       cwd: root, encoding: "utf8", stdio: "pipe",
       env: {
-        ...process.env, GITHUB_ACTIONS: "true", RELEASE_VERSION: "",
+        ...process.env, GITHUB_ACTIONS: "true", RELEASE_VERSION: released,
         PARAGRAPH_WRAP_PACKAGE_ARCHIVE: "", PATH: `${bin}:${process.env.PATH}`,
       },
     });
     const source = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
-    assert.equal(source.version, nextVersion(manifest.version));
-    assert.equal(JSON.parse(git("show", `v${manifest.version}:package.json`)).version, manifest.version);
-    assert.match(await readFile(join(root, "CHANGELOG.md"), "utf8"), /^## 0\.2\.2 \(Next\)$/mu);
+    assert.equal(source.version, nextVersion(released));
+    assert.equal(JSON.parse(git("show", `v${released}:package.json`)).version, released);
+    assert.match(await readFile(join(root, "CHANGELOG.md"), "utf8"), /^## 0\.3\.1 \(Next\)$/mu);
+    const releasedReadme = readme.replace(`@${manifest.version}`, `@${released}`);
+    assert.equal(git("show", `v${released}:README.md`), releasedReadme);
+    assert.equal(await readFile(join(root, "README.md"), "utf8"), releasedReadme);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

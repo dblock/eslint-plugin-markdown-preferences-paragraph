@@ -6,7 +6,7 @@ import { resolve } from "node:path";
 import process from "node:process";
 
 const archivePath = ".release/package.tgz";
-const metadataPaths = ["CHANGELOG.md", "package-lock.json", "package.json"];
+const metadataPaths = ["CHANGELOG.md", "README.md", "package-lock.json", "package.json"];
 const trailer = "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>";
 const command = (program, args, options = {}) => execFileSync(program, args, { encoding: "utf8", ...options });
 const json = async (path) => JSON.parse(await readFile(path, "utf8"));
@@ -103,6 +103,10 @@ export async function releaseStep(step, version, { execute = command } = {}) {
       : developmentChangelog(changelog, version);
     await writeFile("CHANGELOG.md", text);
     if (step === "prepare") {
+      const readme = await readFile("README.md", "utf8");
+      const install = /^(npm install --save-dev eslint @eslint\/markdown eslint-plugin-markdown-preferences-paragraph-wrap@)\d+\.\d+\.\d+$/gmu;
+      assert.equal([...readme.matchAll(install)].length, 1, "Require one versioned README installation command.");
+      await writeFile("README.md", readme.replace(install, `$1${version}`));
       const [archive] = JSON.parse(execute("npm", ["pack", "--json", "--pack-destination", ".release"]));
       assert.match(archive.filename, /^[A-Za-z0-9._-]+\.tgz$/u);
       await rename(resolve(".release", archive.filename), archivePath);
@@ -116,7 +120,7 @@ export async function releaseStep(step, version, { execute = command } = {}) {
     for (const entry of execute("git", ["status", "--porcelain", "-z"]).split("\0").filter(Boolean)) {
       assert.ok(/^ ?M /u.test(entry) && metadataPaths.includes(entry.slice(3)), `Unexpected release change: ${entry}`);
     }
-    for (const path of metadataPaths.slice(1)) {
+    for (const path of ["package.json", "package-lock.json"]) {
       validateMetadata(JSON.parse(git("show", `HEAD:${path}`)), await json(path), version);
     }
     return;
