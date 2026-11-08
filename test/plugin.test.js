@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ESLint } from "eslint";
 import markdown from "@eslint/markdown";
-import plugin from "eslint-plugin-markdown-preferences-paragraph-wrap";
+import plugin from "eslint-plugin-markdown-preferences-paragraph";
 import preferences from "eslint-plugin-markdown-preferences";
 import { configuration } from "../test-support/configuration.js";
 import { diagnostics, fixtures } from "../test-support/fixtures.js";

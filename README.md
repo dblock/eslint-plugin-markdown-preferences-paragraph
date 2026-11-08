@@ -1,15 +1,15 @@
 <img src="assets/logo.svg" alt="Pale blue notepad with a thin border and a paragraph-wrap arrow" width="160">
 
-# ESLint Plugin Markdown Preferences Paragraph Wrap
+# ESLint Plugin Markdown Preferences Paragraph
 
-[![Test](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/test.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/test.yml) [![Lint](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/lint.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/lint.yml) [![Package](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/package.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/package.yml) [![Coverage](https://coveralls.io/repos/github/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/badge.svg?branch=master)](https://coveralls.io/github/dblock/eslint-plugin-markdown-preferences-paragraph-wrap?branch=master)
+[![Test](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/test.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/test.yml) [![Lint](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/lint.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/lint.yml) [![Package](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/package.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/workflows/package.yml) [![Coverage](https://coveralls.io/repos/github/dblock/eslint-plugin-markdown-preferences-paragraph/badge.svg?branch=master)](https://coveralls.io/github/dblock/eslint-plugin-markdown-preferences-paragraph?branch=master)
 
 An ESLint plugin for checking and safely fixing Markdown paragraph wrapping, inspired by [eslint-plugin-markdown-preferences#338](https://github.com/ota-meshi/eslint-plugin-markdown-preferences/issues/338).
 
 ## Installation
 
 ```sh
-npm install --save-dev eslint @eslint/markdown eslint-plugin-markdown-preferences-paragraph-wrap@0.1.0
+npm install --save-dev eslint @eslint/markdown eslint-plugin-markdown-preferences-paragraph@0.1.0
 ```
 
 Requires Node.js 22.13 or a supported newer version, ESLint 9.39 or 10.x, and `@eslint/markdown` 8.x.
@@ -20,14 +20,14 @@ In `eslint.config.js`:
 
 ```js
 import markdown from "@eslint/markdown";
-import paragraphWrap from "eslint-plugin-markdown-preferences-paragraph-wrap";
+import paragraph from "eslint-plugin-markdown-preferences-paragraph";
 
 export default [{
   files: ["**/*.md"],
-  plugins: { markdown, paragraphWrap },
+  plugins: { markdown, paragraph },
   language: "markdown/gfm",
   rules: {
-    "paragraphWrap/paragraph-wrap": ["error", { width: 80 }],
+    "paragraph/paragraph-wrap": ["error", { width: 80 }],
   },
 }];
 ```

@@ -88,7 +88,7 @@ test("release hooks validate one archive and prepare the next version", { skip: 
       repository: { type: "git", url: "git+https://github.com/example/release-fixture.git" },
     };
     const released = "0.3.0";
-    const readme = `# Release Fixture\n\nnpm install --save-dev eslint @eslint/markdown eslint-plugin-markdown-preferences-paragraph-wrap@${manifest.version}\n`;
+    const readme = `# Release Fixture\n\nnpm install --save-dev eslint @eslint/markdown eslint-plugin-markdown-preferences-paragraph@${manifest.version}\n`;
     await writeFile(join(root, "README.md"), readme);
     await writeFile(join(root, "package.json"), JSON.stringify(manifest));
     await writeFile(join(root, "package-lock.json"), JSON.stringify({
@@ -125,7 +125,7 @@ if (args[0] === "view") {
 } else if (args[0] === "pack") {
   assert.ok(!existsSync(".release/package.tgz"), "Pack only once.");
   assert.ok(readFileSync("README.md", "utf8").includes(
-    "eslint-plugin-markdown-preferences-paragraph-wrap@" + JSON.parse(readFileSync("package.json", "utf8")).version));
+    "eslint-plugin-markdown-preferences-paragraph@" + JSON.parse(readFileSync("package.json", "utf8")).version));
   writeFileSync(".release/fixture.tgz", "validated artifact");
   console.log(JSON.stringify([{filename:"fixture.tgz"}]));
 } else if (args[0] === "test") {

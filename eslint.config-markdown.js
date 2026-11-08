@@ -1,6 +1,6 @@
 import markdown from "@eslint/markdown";
 import preferences from "eslint-plugin-markdown-preferences";
-import paragraphWrap from "eslint-plugin-markdown-preferences-paragraph-wrap";
+import paragraph from "eslint-plugin-markdown-preferences-paragraph";
 import documentation from "./scripts/documentation-plugin.js";
 
 export default [
@@ -12,7 +12,7 @@ export default [
     plugins: {
       markdown,
       "markdown-preferences": preferences,
-      "markdown-preferences-paragraph-wrap": paragraphWrap,
+      paragraph,
       documentation,
     },
     language: "markdown/gfm",
@@ -34,7 +34,7 @@ export default [
           "First-Version", "Data-Driven",
         ],
       }],
-      "markdown-preferences-paragraph-wrap/paragraph-wrap": ["error", { width: "nowrap" }],
+      "paragraph/paragraph-wrap": ["error", { width: "nowrap" }],
       "documentation/spelling": "error",
       "documentation/first-heading": "error",
       "documentation/final-newline": "error",

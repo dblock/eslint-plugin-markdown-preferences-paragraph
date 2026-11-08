@@ -37,12 +37,12 @@ For artwork changes, follow [Logo Maintenance](DESIGN.md#logo). Keep the editabl
 Keep the primary checkout on `master`; use a separate worktree and `<username>/<topic>` branch for each PR. For example, after inspecting existing branches and worktrees:
 
 ```sh
-git worktree add -b dblock/implementation ../eslint-plugin-markdown-preferences-paragraph-wrap-implementation master
+git worktree add -b dblock/implementation ../eslint-plugin-markdown-preferences-paragraph-implementation master
 ```
 
 Preserve unrelated work. Prefer one coherent commit per PR and squash multiple topic-branch commits before pushing. Squash-merge PRs; do not use merge commits. Do not push development changes directly to `master`, force-push `master`, amend without approval, or merge/publish/tag without explicit authorization. If a prerequisite PR remains open, obtain the appropriate stacked-PR workflow before creating a dependent PR.
 
-Update affected documentation and add CHANGELOG entries for features, improvements, and fixes, but not minor typos or the initial scaffold. Use `- [#123](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/pull/123): Description - [@dblock](https://github.com/dblock).` with the actual PR number and contributor. Append entries chronologically above `- Your contribution here.` in the Next section. Predict the PR number before opening when reliable, then verify it and correct mismatches without unauthorized amending or force-pushing.
+Update affected documentation and add CHANGELOG entries for features, improvements, and fixes, but not minor typos or the initial scaffold. Use `- [#123](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/123): Description - [@dblock](https://github.com/dblock).` with the actual PR number and contributor. Append entries chronologically above `- Your contribution here.` in the Next section. Predict the PR number before opening when reliable, then verify it and correct mismatches without unauthorized amending or force-pushing.
 
 Feature additions increment minor versions in the same PR: reset patch for `0.x`, preserve patch for `1.x` and later. Ask whether to bump major for breaking changes. Synchronize the package manifest and lockfile; see [Releasing](RELEASING.md).
 

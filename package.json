@@ -1,5 +1,5 @@
 {
-  "name": "eslint-plugin-markdown-preferences-paragraph-wrap",
+  "name": "eslint-plugin-markdown-preferences-paragraph",
   "version": "0.1.0",
   "description": "An ESLint plugin for checking and safely fixing Markdown paragraph wrapping.",
   "type": "module",
@@ -56,12 +56,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap.git"
+    "url": "git+https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph.git"
   },
   "bugs": {
-    "url": "https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/issues"
+    "url": "https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/issues"
   },
-  "homepage": "https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap#readme",
+  "homepage": "https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph#readme",
   "license": "MIT",
   "author": "dblock",
   "keywords": [
