@@ -1,5 +1,5 @@
 export function configuration(fixture, { markdown, preferences, plugin }) {
-  const namespace = "markdown-preferences-paragraph-wrap";
+  const namespace = "paragraph";
   const extended = fixture.language === "extended-syntax";
   const nonParagraph = {
     paragraph: "ignore",

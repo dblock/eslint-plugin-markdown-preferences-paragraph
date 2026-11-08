@@ -104,7 +104,7 @@ export async function releaseStep(step, version, { execute = command } = {}) {
     await writeFile("CHANGELOG.md", text);
     if (step === "prepare") {
       const readme = await readFile("README.md", "utf8");
-      const install = /^(npm install --save-dev eslint @eslint\/markdown eslint-plugin-markdown-preferences-paragraph-wrap@)\d+\.\d+\.\d+$/gmu;
+      const install = /^(npm install --save-dev eslint @eslint\/markdown eslint-plugin-markdown-preferences-paragraph@)\d+\.\d+\.\d+$/gmu;
       assert.equal([...readme.matchAll(install)].length, 1, "Require one versioned README installation command.");
       await writeFile("README.md", readme.replace(install, `$1${version}`));
       const [archive] = JSON.parse(execute("npm", ["pack", "--json", "--pack-destination", ".release"]));

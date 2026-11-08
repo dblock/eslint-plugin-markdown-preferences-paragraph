@@ -243,7 +243,7 @@ export default {
     languages: ["markdown/*", "markdown-preferences/*"],
     docs: {
       description: "Wrap or unwrap Markdown paragraphs without changing their structure.",
-      url: "https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap#configuration",
+      url: "https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph#configuration",
     },
     fixable: "whitespace",
     schema: [{

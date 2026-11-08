@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Create `eslint-plugin-markdown-preferences-paragraph-wrap`, an independent, opt-in ESLint plugin that checks and safely fixes Markdown paragraph wrapping. Support both positive numeric widths and `"nowrap"` in one `paragraph-wrap` rule, without becoming a general Markdown formatter.
+Create `eslint-plugin-markdown-preferences-paragraph`, an independent, opt-in ESLint plugin that checks and safely fixes Markdown paragraph wrapping. Support both positive numeric widths and `"nowrap"` in one `paragraph-wrap` rule, without becoming a general Markdown formatter.
 
 [To Wrap or Not to Wrap in Markdown?](https://code.dblock.org/2021/06/07/to-wrap-or-not-to-wrap-in-markdown.html) motivates one source line per paragraph: arbitrary reflow can turn a small wording edit into changes across several lines. This is a source-format preference, not a guarantee that all Markdown renderers treat soft line breaks identically.
 
@@ -41,9 +41,9 @@ This project follows the separate `paragraph-wrap` direction but cannot deprecat
 
 ## Proposed Public API
 
-Keep the requested repository and npm package name `eslint-plugin-markdown-preferences-paragraph-wrap`, under GitHub owner `dblock`. Before scaffolding, the GitHub repository lookup returned `404`, and npm returned `E404` for the unscoped package name; these checks suggest availability but do not reserve the names or guarantee registry acceptance.
+Use the repository and npm package name `eslint-plugin-markdown-preferences-paragraph`, under GitHub owner `dblock`. Before this pre-release rename on November 8, 2026, the GitHub repository lookup found no repository, and npm returned `E404` for the unscoped package name; these checks suggest availability but do not reserve the names or guarantee registry acceptance.
 
-Export one ESM plugin object with `meta` and `rules["paragraph-wrap"]`. Use the conventional namespace `markdown-preferences-paragraph-wrap`; users may choose a shorter local alias. There is no standalone CLI, replacement parser, fork of the upstream plugin, or automatic activation of unrelated rules.
+Export one ESM plugin object with `meta` and `rules["paragraph-wrap"]`. Register it as `paragraph` to use `paragraph/paragraph-wrap`; the namespace is an ESLint configuration alias, not part of the exported rule name. There is no standalone CLI, replacement parser, fork of the upstream plugin, or automatic activation of unrelated rules.
 
 ### Options
 
@@ -65,18 +65,18 @@ The public consumer configuration is:
 
 ```js
 import markdown from "@eslint/markdown";
-import paragraphWrap from "eslint-plugin-markdown-preferences-paragraph-wrap";
+import paragraph from "eslint-plugin-markdown-preferences-paragraph";
 
 export default [
   {
     files: ["**/*.md", "**/*.markdown"],
     plugins: {
       markdown,
-      "markdown-preferences-paragraph-wrap": paragraphWrap,
+      paragraph,
     },
     language: "markdown/gfm",
     rules: {
-      "markdown-preferences-paragraph-wrap/paragraph-wrap": [
+      "paragraph/paragraph-wrap": [
         "error",
         { width: "nowrap" },
       ],

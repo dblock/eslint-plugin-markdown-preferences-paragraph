@@ -44,13 +44,13 @@ export async function consumer(archivePath = process.env.PARAGRAPH_WRAP_PACKAGE_
     ], { cwd: directory, stdio: "pipe" });
     assert.equal(
       JSON.parse(await readFile(join(directory,
-        "node_modules/eslint-plugin-markdown-preferences-paragraph-wrap/package.json"), "utf8")).version,
+        "node_modules/eslint-plugin-markdown-preferences-paragraph/package.json"), "utf8")).version,
       JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8")).version,
       "The installed archive must match the source version being validated.",
     );
     assert.deepEqual(
       await readFile(join(
-        directory, "node_modules/eslint-plugin-markdown-preferences-paragraph-wrap/assets/logo.svg",
+        directory, "node_modules/eslint-plugin-markdown-preferences-paragraph/assets/logo.svg",
       )),
       await readFile(new URL("../assets/logo.svg", import.meta.url)),
       "The installed package must retain the editable README logo.",
@@ -75,7 +75,7 @@ export async function consumer(archivePath = process.env.PARAGRAPH_WRAP_PACKAGE_
       const config = join(path, "eslint.config.js");
       await writeFile(config, `import markdown from "@eslint/markdown";
 import preferences from "eslint-plugin-markdown-preferences";
-import plugin from "eslint-plugin-markdown-preferences-paragraph-wrap";
+import plugin from "eslint-plugin-markdown-preferences-paragraph";
 import { configuration } from "../configuration.js";
 export default [configuration(${JSON.stringify(fixture.metadata)}, { markdown, preferences, plugin })];
 `);

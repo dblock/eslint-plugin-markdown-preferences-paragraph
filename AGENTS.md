@@ -1,4 +1,4 @@
-# Working on ESLint Plugin Markdown Preferences Paragraph Wrap
+# Working on ESLint Plugin Markdown Preferences Paragraph
 
 Read [CONTRIBUTING](CONTRIBUTING.md) and [DESIGN](DESIGN.md) before changing code.
 
