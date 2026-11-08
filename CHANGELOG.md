@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 (Next)
+## 0.2.0 (2026/11/08)
 
 - [#12](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/12): Replace custom documentation spelling with eslint-plugin-prose-spellcheck 0.1.0 - [@dblock](https://github.com/dblock).
 - [#13](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/13): Document trusted publishing for manually dispatched npm releases - [@dblock](https://github.com/dblock).
@@ -8,7 +8,6 @@
 - [#15](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/15): Upgrade eslint-plugin-prose-spellcheck to 0.1.1 - [@dblock](https://github.com/dblock).
 - [#16](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/16): Add opt-in balanced numeric paragraph wrapping while retaining greedy defaults and conservative fix safety - [@dblock](https://github.com/dblock).
 - [#17](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/17): Confirm npm registry publication after next-version preparation and tolerate visibility timeouts - [@dblock](https://github.com/dblock).
-- Your contribution here.
 
 ## 0.1.0 (2026/11/08)
 
