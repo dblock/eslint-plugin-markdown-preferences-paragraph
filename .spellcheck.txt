@@ -4,6 +4,7 @@ Coveralls
 ESLint's
 ESM
 GFM
+SVG
 RuboCop
 UTF
 autolinks

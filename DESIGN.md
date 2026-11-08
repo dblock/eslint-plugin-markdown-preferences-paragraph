@@ -205,6 +205,14 @@ Include LF and CRLF cases and a missing-final-newline case. Preserve fixture byt
 
 Use focused helper tests only for behavior that cannot be expressed clearly through file fixtures. New end-to-end behavior should normally require adding or updating a fixture, not adding a case-specific branch to the runner. Fixture failures must identify the case and phase and show a concise diagnostic or file diff.
 
+## Logo
+
+[`assets/logo.svg`](assets/logo.svg) is original artwork created by GitHub Copilot for this project from the approved notepad-and-wrap-arrow concept, refined to a softer pale blue palette with a thin border. It uses the project's [MIT license](LICENSE); no third-party logos, fonts, or images were adapted.
+
+The SVG is both the editable source and the README display asset. Its transparent 256-by-256 canvas contains a pale blue notepad, a lightly shaded folded corner, a thin blue border, and muted blue paragraph lines with a returning wrap arrow. The README places it above the title at 160 pixels wide, with descriptive alternative text and blank lines separating the logo, title, and badges.
+
+Edit the SVG paths and colors directly; no generator, font, or raster conversion is required. Preserve the view box, accessible title/description, transparent background, and clear geometry at the README display size. Keep previews outside the package and repository. Inspect the full-size SVG and rendered README at 160 pixels on light and dark backgrounds for legibility and clipping; run `npm run lint` and `npm test`. The packed-consumer suite verifies that the exact editable logo is installed with the README.
+
 ## Scope and Review Gates
 
 The first implementation includes numeric wrapping and `"nowrap"` together, one width policy for all paragraphs, safe fixes, documentation, and real host/package tests. Non-goals are container-specific policies, upstream deprecation work, a full Markdown formatter, semantic sentence wrapping, MDX or arbitrary renderer support, and automatic cross-rule conflict resolution.

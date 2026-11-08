@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title description">
+  <title id="title">Paragraph Wrapping</title>
+  <desc id="description">A pale blue notepad with a thin border, muted blue paragraph lines, and a returning wrap arrow.</desc>
+  <path d="M60 20h108l40 40v156a20 20 0 0 1-20 20H60a20 20 0 0 1-20-20V40a20 20 0 0 1 20-20Z" fill="#f1f7fc" stroke="#b8cedf" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M168 20v40h40Z" fill="#deebf6" stroke="#b8cedf" stroke-width="2" stroke-linejoin="round"/>
+  <g fill="none" stroke="#8cafca" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M72 76h70M72 106h110M72 136h60M72 166h60M72 196h110"/>
+    <path d="M174 128h8a18 18 0 0 1 0 36h-22"/>
+    <path d="m174 150-14 14 14 14"/>
+  </g>
+</svg>

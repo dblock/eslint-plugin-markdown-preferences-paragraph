@@ -7,6 +7,7 @@ export default {
   config: {
     default: true,
     MD013: false,
+    MD033: { allowed_elements: ["img"] },
     "single-line-paragraphs": { enabled: true },
     "title-case-style": {
       case: "title",
