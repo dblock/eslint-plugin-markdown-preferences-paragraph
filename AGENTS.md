@@ -4,9 +4,9 @@ Read [CONTRIBUTING](CONTRIBUTING.md) and [DESIGN](DESIGN.md) before changing cod
 
 ## Scope and Invariants
 
-The `wrap` rule has one `width` option shared by every paragraph; omitting it skips checks. There are no container-specific settings or URL exemptions. This is not a full Markdown formatter or an upstream `max-len` replacement.
+The `wrap` rule has one `width` policy shared by every paragraph; omitting it skips checks. An optional numeric `strategy` selects default greedy or balanced wrapping. There are no container-specific settings or URL exemptions. This is not a full Markdown formatter or an upstream `max-len` replacement.
 
-Numeric widths enforce safe greedy reflow, not only a maximum line length. Changing the configured width must reflow existing shorter lines while preserving intentional hard-break boundaries; already canonical wrapping stays untouched.
+Numeric widths enforce safe reflow, not only a maximum line length. Balanced wrapping minimizes line count, then squared unused source columns, without changing greedy defaults. Keep its search bounded and use the same safe gaps and AST verification. Changing the configured width must reflow existing shorter lines while preserving intentional hard-break boundaries; already canonical wrapping stays untouched.
 
 The report-only `max-words` rule requires an explicit positive `max`. Count prose and link labels through the paragraph AST using English word segmentation; do not count code, images, footnote markers, destinations, or titles. Keep it independent of wrapping, and do not suggest paragraph boundaries or add fixes.
 
@@ -28,7 +28,7 @@ Update affected documentation. Features, improvements, and fixes require a CHANG
 
 Preserve the original editable `assets/logo.svg`, its MIT licensing, accessible metadata, and 160-pixel README placement above the title. Follow [Logo Maintenance](DESIGN.md#logo); inspect full-size and light/dark README rendering after artwork changes. The logo must remain in the npm archive, and generated previews must not be committed.
 
-For features, increment the minor version in the same PR; for `0.x`, reset patch to zero (`0.1.1` to `0.2.0`); for `1.x` and later, preserve patch (`5.3.1` to `5.4.1`). For breaking changes, ask whether to bump major. Synchronize `package.json` and `package-lock.json`; metadata derives its version from the package manifest.
+For features, increment the minor version in the same PR; for `0.x`, reset patch to zero (`0.1.1` to `0.2.0`); for `1.x` and later, preserve patch (`5.3.1` to `5.4.1`). Once an unreleased minor version is prepared, collect further features in that same Next section until it is released. For breaking changes, ask whether to bump major. Synchronize `package.json` and `package-lock.json`; metadata derives its version from the package manifest.
 
 Release automation uses development-only `release-it` and `scripts/release.js` on Node 26.13.0. Tests in `test/release.test.js` cover project-owned changelog/version/metadata/registry guards and one isolated release integration without publishing; CLI/integration checks skip older runtimes below release-it's supported minimum. Do not recreate release-it's Git/npm failure matrix. Preserve the checked-in version as the default, validate optional stable-version overrides, and require meaningful Next notes. `PARAGRAPH_WRAP_PACKAGE_ARCHIVE` makes the existing packed-consumer suite validate the exact release tarball rather than creating a replacement.
 

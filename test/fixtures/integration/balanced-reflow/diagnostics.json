@@ -1,0 +1,4 @@
+{
+  "before": [{ "messageId": "reflow", "line": 1, "column": 1, "fixable": true }],
+  "after": []
+}

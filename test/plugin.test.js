@@ -20,6 +20,7 @@ for (const fixture of await fixtures()) {
       assert.deepEqual(fixture.input, fixture.expected);
       return;
     }
+
     const [before] = await eslint.lintText(input, { filePath });
     assert.deepEqual(diagnostics(before.messages, fixture.diagnostics.before), fixture.diagnostics.before);
     const fixer = new ESLint({
@@ -36,3 +37,20 @@ for (const fixture of await fixtures()) {
     assert.deepEqual(diagnostics(stable.messages, fixture.diagnostics.after), fixture.diagnostics.after);
   });
 }
+
+test("balanced wrapping bounds work for unusually large searches", async () => {
+  const eslint = new ESLint({
+    overrideConfigFile: true,
+    overrideConfig: [configuration({
+      language: "commonmark",
+      options: { width: 10_000, strategy: "balanced" },
+    }, { markdown, preferences, plugin })],
+    fix: true,
+  });
+  const input = Array.from({ length: 4_000 }, () => "word").join(" ") + "\n";
+  const [result] = await eslint.lintText(input, { filePath: "input.md" });
+  assert.equal(result.output, undefined);
+  assert.equal(result.messages.length, 1);
+  assert.equal(result.messages[0].messageId, "width");
+  assert.equal(result.messages[0].fix, undefined);
+});

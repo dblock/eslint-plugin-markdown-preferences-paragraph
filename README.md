@@ -40,9 +40,9 @@ npx eslint "**/*.md"
 
 ## Configuration
 
-### Paragraph Wrapping
+### `paragraph/wrap`
 
-`paragraph/wrap` accepts one option, `width`:
+`paragraph/wrap` accepts `width` and an optional numeric wrapping `strategy`:
 
 | Value | Behavior |
 | --- | --- |
@@ -55,7 +55,17 @@ One width policy applies to every paragraph, including paragraphs in lists, bloc
 
 Numeric widths include source markup and container prefixes, Unicode display width, and four-column tab stops.
 
-### Paragraph Word Limits
+The default `"greedy"` strategy fills each line before starting the next. Choose `"balanced"` to use the fewest possible lines and reduce uneven line lengths, including a short final line:
+
+```json
+{
+  "paragraph/wrap": ["error", { "width": 80, "strategy": "balanced" }]
+}
+```
+
+Both strategies preserve atomic constructs and hard breaks. `strategy` has no effect with omitted `width`, `"ignore"`, or `"nowrap"`. Very large balancing searches remain report-only rather than allowing unbounded linting work.
+
+### `paragraph/max-words`
 
 Set a positive integer `max` to report paragraphs exceeding that word count:
 
