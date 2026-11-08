@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-markdown-preferences-paragraph-wrap",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "An ESLint plugin for checking and safely fixing Markdown paragraph wrapping.",
   "type": "module",
   "exports": {
@@ -69,6 +69,9 @@
     "wrap"
   ],
   "c8": {
-    "include": ["src/**/*.js", "scripts/check-workflow-names.js"]
+    "include": [
+      "src/**/*.js",
+      "scripts/check-workflow-names.js"
+    ]
   }
 }

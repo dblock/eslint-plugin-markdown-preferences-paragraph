@@ -1,0 +1,9 @@
+{
+  "before": [
+    { "messageId": "reflow", "line": 1, "column": 1, "fixable": true },
+    { "messageId": "reflow", "line": 4, "column": 1, "fixable": true },
+    { "messageId": "reflow", "line": 6, "column": 1, "fixable": true },
+    { "messageId": "reflow", "line": 11, "column": 1, "fixable": true }
+  ],
+  "after": []
+}

@@ -6,6 +6,8 @@ Read [CONTRIBUTING](CONTRIBUTING.md) and [DESIGN](DESIGN.md) before changing cod
 
 The `paragraph-wrap` rule has one `width` option shared by every paragraph; omitting it skips checks. There are no container-specific settings or URL exemptions. This is not a full Markdown formatter or an upstream `max-len` replacement.
 
+Numeric widths enforce safe greedy reflow, not only a maximum line length. Changing the configured width must reflow existing shorter lines while preserving intentional hard-break boundaries; already canonical wrapping stays untouched.
+
 The plugin entry point is `src/index.js`, and the rule is `src/rules/paragraph-wrap.js`. Tests live in `test/`, fixtures in `test/fixtures/integration/`, and shared test support in `test-support/`. Use public ESLint and Markdown language APIs, not upstream internal imports or global dependency mutation. Fixes must preserve source offsets, inline literals, hard breaks, container structure, and line endings, and stabilize on a second pass. Unsafe edits must remain report-only. Require AST equivalence under every public dialect matching the original document; do not guess the active language or rewrite unmatched extension syntax.
 
 ## Setup and Validation

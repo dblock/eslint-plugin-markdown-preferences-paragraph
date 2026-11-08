@@ -11,7 +11,7 @@ An ESLint plugin for checking and safely fixing Markdown paragraph wrapping, ins
 Run `npm pack` from this checkout, then install the resulting tarball in your consuming project until an npm release is published:
 
 ```sh
-npm install --save-dev eslint @eslint/markdown /path/to/eslint-plugin-markdown-preferences-paragraph-wrap-0.2.0.tgz
+npm install --save-dev eslint @eslint/markdown /path/to/eslint-plugin-markdown-preferences-paragraph-wrap-0.1.0.tgz
 ```
 
 Requires Node.js 22.13 or a supported newer version, ESLint 9.39 or 10.x, and `@eslint/markdown` 8.x.
@@ -40,7 +40,7 @@ Check with `npx eslint "**/*.md" "**/*.markdown"`; add `--fix` to safely join so
 
 The only option is `width`: a positive integer wraps overlong source lines, `"nowrap"` joins soft line breaks without a width limit, and `"ignore"` skips paragraph checks. Omitting `width` also skips checks and leaves paragraphs untouched. One policy applies to every paragraph; there are no container overrides, URL exemptions, or recommended presets.
 
-Numeric widths include source markup and container prefixes, Unicode display width, and four-column tab stops. Already compliant paragraphs are not reflowed. URLs and indivisible inline constructs are never split; unsafe or impossible corrections report without a fix. See [Fix Safety](DESIGN.md#integration-and-implementation) for conservative limitations.
+Numeric widths include source markup and container prefixes, Unicode display width, and four-column tab stops. Safe paragraph segments reflow to the configured width, even if their existing lines already fit: changing `width` from `30` to `80` and running `--fix` fills the wider lines. Already canonical wrapping stays untouched, and intentional hard breaks remain separate. URLs and indivisible inline constructs are never split; unsafe or impossible corrections to overlong lines report without a fix. See [Fix Safety](DESIGN.md#integration-and-implementation) for conservative limitations.
 
 If you also use `markdown-preferences/max-len`, explicitly ignore its paragraph checks at the root and in containers as shown in [Coexistence](DESIGN.md#coexistence-with-existing-length-rules). Disable markdownlint `MD013` when enforcing unrestricted `"nowrap"`.
 
