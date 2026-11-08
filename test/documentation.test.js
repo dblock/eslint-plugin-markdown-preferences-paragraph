@@ -1,23 +1,48 @@
 import assert from "node:assert/strict";
+import { readFile, readdir } from "node:fs/promises";
+import process from "node:process";
 import test from "node:test";
-import { lint } from "markdownlint/promise";
-import MarkdownIt from "markdown-it";
-import titleCaseStyle from "markdownlint-rule-title-case-style";
+import { ESLint } from "eslint";
+import codeConfig from "../eslint.config.js";
 
-test("the heading rule accepts title case and rejects sentence case", async () => {
-  const results = await lint({
-    strings: {
-      valid: "# Setup and Validation\n",
-      invalid: "# Setup and validation\n",
-    },
-    customRules: [titleCaseStyle],
-    markdownItFactory: () => new MarkdownIt({ html: true }),
-    config: {
-      default: false,
-      "title-case-style": { case: "title" },
-    },
+const [major, minor] = process.versions.node.split(".").map(Number);
+const supportsSpelling = major > 22 || (major === 22 && minor >= 18);
+const root = new URL("./fixtures/documentation/", import.meta.url);
+
+function checkDiagnostics(messages, expected, phase) {
+  assert.equal(messages.length, expected.length, `${phase}: diagnostic count`);
+  for (const [index, fields] of expected.entries()) {
+    const message = { ...messages[index], fixable: Boolean(messages[index].fix) };
+    for (const [field, value] of Object.entries(fields)) {
+      assert.deepEqual(message[field], value, `${phase}: ${field}`);
+    }
+  }
+}
+
+for (const name of (await readdir(root)).sort()) {
+  const directory = new URL(`${name}/`, root);
+  const metadata = JSON.parse(await readFile(new URL("case.json", directory), "utf8"));
+  test(`documentation: ${name}`, {
+    skip: metadata.configuration === "markdown" && !supportsSpelling,
+  }, async () => {
+    const config = metadata.configuration === "code"
+      ? codeConfig
+      : (await import("../eslint.config-markdown.js")).default;
+    const input = await readFile(new URL("input.md", directory), "utf8");
+    const expected = await readFile(new URL("expected.md", directory), "utf8");
+    const messages = JSON.parse(await readFile(new URL("diagnostics.json", directory), "utf8"));
+    const options = { overrideConfigFile: true, overrideConfig: config };
+    const file = { filePath: metadata.fileName ?? "documentation.md", warnIgnored: false };
+    const eslint = new ESLint(options);
+    const [before] = await eslint.lintText(input, file);
+    checkDiagnostics(before?.messages ?? [], messages.before, "before");
+    const fixer = new ESLint({ ...options, fix: true });
+    const [after] = await fixer.lintText(input, file);
+    const output = after?.output ?? input;
+    assert.equal(output, expected, "fixed text");
+    checkDiagnostics(after?.messages ?? [], messages.after, "after");
+    const [stable] = await fixer.lintText(output, file);
+    assert.equal(stable?.output ?? output, output, "stability");
+    checkDiagnostics(stable?.messages ?? [], messages.after, "stability");
   });
-  assert.equal(results.valid.length, 0);
-  assert.equal(results.invalid.length, 1);
-  assert.ok(results.invalid[0].ruleNames.includes("title-case-style"));
-});
+}

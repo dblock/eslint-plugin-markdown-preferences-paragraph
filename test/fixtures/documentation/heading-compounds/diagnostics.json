@@ -1,0 +1,7 @@
+{
+  "before": [
+    { "ruleId": "markdown-preferences/heading-casing", "line": 1, "fixable": true },
+    { "ruleId": "markdown-preferences/heading-casing", "line": 3, "fixable": true }
+  ],
+  "after": []
+}

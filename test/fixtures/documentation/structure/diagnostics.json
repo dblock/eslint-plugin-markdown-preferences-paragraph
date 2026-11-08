@@ -1,0 +1,10 @@
+{
+  "before": [
+    { "ruleId": "markdown/heading-increment", "line": 3, "fixable": false },
+    { "ruleId": "markdown/no-missing-label-refs", "line": 5, "fixable": false }
+  ],
+  "after": [
+    { "ruleId": "markdown/heading-increment", "line": 3, "fixable": false },
+    { "ruleId": "markdown/no-missing-label-refs", "line": 5, "fixable": false }
+  ]
+}

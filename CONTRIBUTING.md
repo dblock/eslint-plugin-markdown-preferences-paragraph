@@ -16,7 +16,7 @@ npm run package:check
 
 Run `npm test` and `npm run lint` before every push, including updates to a PR. Run final checks before committing and reuse results for the push when tested content/configuration has not changed. Validate packaging/public-entry-point changes with the packaged CLI fixture suite: it creates an archive with `npm pack`, inspects its contents, installs that exact archive in a temporary consumer, and runs the real ESLint CLI. `npm test` already runs this suite; `npm run package:check` selects it alone, so do not immediately repeat it after a passing full test run.
 
-`npm run lint:code` checks source and embedded JavaScript examples. `npm run lint:markdown` separately checks Markdown source, prose, spelling, single-line paragraphs, and title-case headings. `npm run lint:workflows` parses YAML and checks title case only for workflow, job, and step display names. Machine identifiers, expressions, and arbitrary `name` fields are not capitalization targets.
+`npm run lint:code` checks source and embedded JavaScript examples. `npm run lint:markdown` separately uses ESLint for Markdown structure, prose, spelling, single-line paragraphs, and title-case headings. It combines `@eslint/markdown`, `eslint-plugin-markdown-preferences`, this plugin with `width: "nowrap"`, and native ESLint documentation rules backed by public CSpell dictionary/text APIs. No Markdownlint tools are installed or invoked. `npm run lint:workflows` parses YAML and checks title case only for workflow, job, and step display names. Machine identifiers, expressions, and arbitrary `name` fields are not capitalization targets.
 
 Keep human-readable Markdown headings and YAML display names in title case, preserving proper names and code identifiers. Keep each Markdown prose paragraph on one source line. Review `.spellcheck.txt` additions and fix typos instead of adding them to the dictionary. Intentionally invalid file fixtures are not project documentation.
 
@@ -24,7 +24,7 @@ Test, Lint, and Package have separate CI workflows. Tests cover minimum/current 
 
 ## Tests
 
-Run focused API fixture tests with `node --test test/plugin.test.js` or the packed CLI suite with `npm run package:check`. Tests also exercise Markdown heading-rule integration and the YAML display-name checker.
+Run focused API fixture tests with `node --test test/plugin.test.js` or the packed CLI suite with `npm run package:check`. `node --test test/documentation.test.js` loads the actual ESLint configs against file fixtures for headings, prose wrapping, spelling and original Unicode offsets, structural errors, first headings/final newlines, fixture exclusions, and embedded JavaScript. Native Markdown/spelling fixtures require Node 22.18 or later and are skipped below that development-tool minimum; package API/CLI tests still cover Node 22.13. Tests also exercise the YAML display-name checker.
 
 Both API and CLI tests use the same [data-driven file fixtures](DESIGN.md#data-driven-file-fixtures): metadata, original Markdown, expected fixed Markdown, and stable before/after diagnostics. The CLI suite uses the actual packed plugin with the matrix-selected ESLint version, compares exact bytes and exit status, and verifies second-pass stability without mutating checked-in fixtures. Add cases through fixture files, not case-specific runner branches. Preserve CRLF/mixed endings through `.gitattributes` and the missing-final-newline fixture's bytes. Add focused helper tests only for behavior that is not clearly expressed by file fixtures.
 

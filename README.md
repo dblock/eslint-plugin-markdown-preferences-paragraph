@@ -1,7 +1,5 @@
 <img src="assets/logo.svg" alt="Pale blue notepad with a thin border and a paragraph-wrap arrow" width="160">
 
-<!-- markdownlint-configure-file {"MD041": {"allow_preamble": true}} -->
-
 # ESLint Plugin Markdown Preferences Paragraph Wrap
 
 [![Test](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/test.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/test.yml) [![Lint](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/lint.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/lint.yml) [![Package](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/package.yml/badge.svg)](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/actions/workflows/package.yml) [![Coverage](https://coveralls.io/repos/github/dblock/eslint-plugin-markdown-preferences-paragraph-wrap/badge.svg?branch=master)](https://coveralls.io/github/dblock/eslint-plugin-markdown-preferences-paragraph-wrap?branch=master)

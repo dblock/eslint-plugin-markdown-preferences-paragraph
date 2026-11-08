@@ -1,0 +1,7 @@
+{
+  "before": [
+    { "ruleId": "documentation/first-heading", "line": 1, "fixable": false },
+    { "ruleId": "documentation/final-newline", "line": 1, "fixable": true }
+  ],
+  "after": [{ "ruleId": "documentation/first-heading", "line": 1, "fixable": false }]
+}

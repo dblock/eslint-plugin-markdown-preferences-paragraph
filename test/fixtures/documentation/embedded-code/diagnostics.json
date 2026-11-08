@@ -1,0 +1,4 @@
+{
+  "before": [{ "ruleId": "no-undef", "line": 4, "fixable": false }],
+  "after": [{ "ruleId": "no-undef", "line": 4, "fixable": false }]
+}
