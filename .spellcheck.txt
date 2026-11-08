@@ -5,6 +5,7 @@ ESLint's
 ESM
 GFM
 LTS
+OIDC
 SVG
 RuboCop
 UTF
@@ -15,6 +16,7 @@ coauthored
 dblock
 intraline
 js
+lifecycle
 maintainer's
 markdownlint
 mdformat

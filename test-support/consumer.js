@@ -10,16 +10,18 @@ import markdown from "@eslint/markdown";
 import preferences from "eslint-plugin-markdown-preferences";
 import { diagnostics } from "./fixtures.js";
 
-export async function consumer() {
+export async function consumer(archivePath = process.env.PARAGRAPH_WRAP_PACKAGE_ARCHIVE) {
   const directory = await mkdtemp(join(tmpdir(), "paragraph-wrap-consumer-"));
   const root = fileURLToPath(new URL("../", import.meta.url));
   const npm = process.platform === "win32" ? "npm.cmd" : "npm";
   try {
-    const [archive] = JSON.parse(execFileSync(
+    const [archive] = archivePath ? [{ filename: archivePath }] : JSON.parse(execFileSync(
       npm, ["pack", "--json", "--pack-destination", directory],
       { cwd: root, encoding: "utf8" },
     ));
-    const paths = archive.files.map((file) => file.path);
+    const paths = archivePath ? execFileSync("tar", ["-tzf", archivePath], { encoding: "utf8" })
+      .trim().split("\n").map((path) => path.replace(/^package\//u, ""))
+      : archive.files.map((file) => file.path);
     assert.ok(paths.includes("src/rules/paragraph-wrap.js"));
     assert.ok(paths.includes("LICENSE"));
     assert.ok(paths.includes("assets/logo.svg"), "The README logo must be packaged.");
@@ -38,8 +40,14 @@ export async function consumer() {
     }));
     execFileSync(npm, [
       "install", "--ignore-scripts", "--no-audit", "--no-fund",
-      join(directory, archive.filename),
+      archivePath ?? join(directory, archive.filename),
     ], { cwd: directory, stdio: "pipe" });
+    assert.equal(
+      JSON.parse(await readFile(join(directory,
+        "node_modules/eslint-plugin-markdown-preferences-paragraph-wrap/package.json"), "utf8")).version,
+      JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8")).version,
+      "The installed archive must match the source version being validated.",
+    );
     assert.deepEqual(
       await readFile(join(
         directory, "node_modules/eslint-plugin-markdown-preferences-paragraph-wrap/assets/logo.svg",

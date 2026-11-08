@@ -27,6 +27,7 @@
     "lint:code": "eslint .",
     "lint:markdown": "eslint --config eslint.config-markdown.js \"*.md\"",
     "lint:workflows": "node scripts/check-workflow-names.js",
+    "release": "node scripts/release.js",
     "package:check": "node --test test/integration.test.js"
   },
   "dependencies": {
@@ -36,6 +37,11 @@
     "@eslint/markdown": "^8.0.0",
     "eslint": "^9.39.0 || ^10.0.0"
   },
+  "overrides": {
+    "get-uri": {
+      "basic-ftp": "^6.2.6"
+    }
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@eslint/markdown": "^8.0.3",
@@ -44,6 +50,7 @@
     "eslint": "^10.14.0",
     "eslint-plugin-markdown-preferences": "^0.43.0",
     "cspell-lib": "^10.4.1",
+    "release-it": "^21.1.2",
     "title-case": "^4.3.2",
     "yaml": "^2.9.1"
   },

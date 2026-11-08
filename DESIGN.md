@@ -164,6 +164,18 @@ Native Markdown spelling uses a local ESLint rule backed by public `cspell-lib` 
 
 Documentation file fixtures load the actual Markdown and embedded-code ESLint configs and verify valid/invalid headings, spelling and Unicode locations, public paragraph-wrap fixes, structural errors, final-newline fixes, ignored test fixtures, and literal/code exclusions. These development-tool checks require Node 22.18 or later, independently of the package's lower runtime minimum.
 
+## Release Automation
+
+A manually dispatched GitHub Actions workflow uses development-only `release-it` for version updates, Git commits/tags/pushes, npm trusted publishing, and GitHub Release creation. Project hooks retain the existing handwritten changelog format and validate the exact artifact. Dispatch releases the checked-in stable version unless an explicit stable-version override is supplied. It does not infer versions from conventional commits or publish on merges, and it has no dry-run input.
+
+Release-it 21.1.2 supports the release runtime but its proxy chain selects an outdated FTP client. A scoped `get-uri` override selects stable `basic-ftp` 6.2.6 to address the reported directory-listing denial of service; its public Client methods used by `get-uri` are retained. This release workflow uses HTTPS, not FTP. Recheck and remove the override when the upstream dependency includes the fix.
+
+The hooks reject dirty checkouts, mismatched metadata, empty notes, existing registry versions/tags, unexpected file changes, and concurrent default-branch updates. They pack once to `.release/package.tgz` and run the existing real CLI consumers against that exact archive; `npm.publishPath` lets release-it publish the retained file without replacing it. `npm.skipChecks` avoids token-based authentication checks that cannot validate OIDC. The native flow publishes npm first, then commits/tags and atomically pushes Git without force. A pre-GitHub-Release hook verifies the remote commit/tag and registry integrity, because release-it can report a Git push failure without throwing after npm succeeds.
+
+The clean-check hook replaces `git.requireCleanWorkingDir`, disabling native source-reset and local-tag rollback handlers without allowing a dirty starting checkout. Successful native npm publication prevents release-it from attempting remote-tag rollback on a failed Git push; the next-version run disables tagging altogether. Failures retain the archive, checksum, and metadata patch in Actions artifacts rather than maintaining custom state or Git bundles. Never roll back published packages or delete release tags.
+
+After successful npm publication and GitHub Release creation, a second release-it run increments patch, opens a new Next section through its changelog hook, runs tests and lint against that next version, and commits/pushes its metadata. This run disables npm publication, GitHub Releases, and Git tags; it does not repeat the release hooks. Ordinary development remains PR-based. The explicitly approved no-App setup allows direct default-branch pushes for all repository writers while retaining force-push/deletion protections; the release environment is restricted to `master`. See [Releasing](RELEASING.md) for the one-time npm bootstrap, trusted-publisher configuration, invocation, and failure recovery.
+
 ## Acceptance Tests
 
 | Area | Required Evidence |
