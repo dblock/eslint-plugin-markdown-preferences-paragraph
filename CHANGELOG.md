@@ -5,6 +5,7 @@
 - [#12](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/12): Replace custom documentation spelling with eslint-plugin-prose-spellcheck 0.1.0 - [@dblock](https://github.com/dblock).
 - [#13](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/13): Document trusted publishing for manually dispatched npm releases - [@dblock](https://github.com/dblock).
 - [#14](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/14): Add opt-in, report-only paragraph/max-words - [@dblock](https://github.com/dblock).
+- [#15](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/15): Upgrade eslint-plugin-prose-spellcheck to 0.1.1 - [@dblock](https://github.com/dblock).
 - Your contribution here.
 
 ## 0.1.0 (2026/11/08)

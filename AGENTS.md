@@ -14,7 +14,7 @@ The plugin entry point is `src/index.js`; rules live in `src/rules/wrap.js` and 
 
 ## Setup and Validation
 
-Use Node.js `26.13.0` from `.nvmrc` for development. The package supports Node.js `^22.13.0 || >=24.0.0`, ESLint 9.39 or later within 9.x and 10.x, and `@eslint/markdown` 8.x. Documentation spelling tools require Node.js 22.18 or later and ESLint 10.14 or later within 10.x. Verify and prefer current stable releases when selecting or updating tools, while preserving supported-runtime compatibility.
+Use Node.js `26.13.0` from `.nvmrc` for development. The package supports Node.js `^22.13.0 || >=24.0.0`, ESLint 9.39 or later within 9.x and 10.x, and `@eslint/markdown` 8.x. Documentation spelling tools require Node.js 22.18 on the 22.x line or Node.js 24 or later. Verify and prefer current stable releases when selecting or updating tools, while preserving supported-runtime compatibility.
 
 Run `npm ci`, then `npm test`, `npm run lint`, and `npm run package:check`. A focused API fixture test is `node --test test/plugin.test.js`; coverage is `npm run test:coverage`. The full test command already includes the packaged CLI fixture suite; `npm run package:check` runs that suite alone, so reuse its result instead of immediately repeating it. Run tests and lint before every push, including PR updates. Run final validation before committing and reuse it for the push only if tested content and configuration have not changed. When packaging or public exports change, validate the real `npm pack` artifact in a temporary consumer.
 
@@ -22,7 +22,7 @@ Keep Test, Lint, and Package workflows separate and retain coverage with Coveral
 
 ## Documentation and Versions
 
-Keep Markdown prose paragraphs on one source line. Human-readable headings and YAML display names use title case, preserving proper names, acronyms, expressions, and code identifiers. Add reviewed vocabulary to `.spellcheck.txt`, not broad spelling suppressions. Documentation file fixtures live in `test/fixtures/documentation/`; tests load the actual ESLint configs and check diagnostics, fixes, and stability. Markdown/spelling fixtures require Node 22.18 and ESLint 10.14 within 10.x; package API/CLI fixtures still run on Node 22.13 and ESLint 9. The compatibility selector uses `--legacy-peer-deps` only for ESLint 9 because the development-only spelling plugin is not executed there; retain strict peer checks for ESLint 10.
+Keep Markdown prose paragraphs on one source line. Human-readable headings and YAML display names use title case, preserving proper names, acronyms, expressions, and code identifiers. Add reviewed vocabulary to `.spellcheck.txt`, not broad spelling suppressions. Documentation file fixtures live in `test/fixtures/documentation/`; tests load the actual ESLint configs and check diagnostics, fixes, and stability. Markdown/spelling fixtures run with both supported ESLint majors and skip only below their Node minimum; package API/CLI fixtures still run on Node 22.13. Keep strict peer checks for both ESLint compatibility pairs.
 
 Update affected documentation. Features, improvements, and fixes require a CHANGELOG entry with the actual PR number and contributor attribution; minor typos and the initial scaffold do not. Predict a PR number before opening when reliable, then verify and correct it. Append entries above the final placeholder in chronological order.
 

@@ -31,8 +31,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
       - name: Select ESLint Compatibility Pair
-        # The development-only spelling plugin is not run with ESLint 9.
-        run: npm install --no-save --package-lock=false ${{ startsWith(matrix.entry.eslint, '9.') && '--legacy-peer-deps' || '' }} eslint@${{ matrix.entry.eslint }} @eslint/js@${{ matrix.entry.js }}
+        run: npm install --no-save --package-lock=false eslint@${{ matrix.entry.eslint }} @eslint/js@${{ matrix.entry.js }}
       - name: Run Tests
         run: npm test
 
