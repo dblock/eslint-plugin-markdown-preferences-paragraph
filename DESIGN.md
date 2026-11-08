@@ -1,6 +1,6 @@
 # Design
 
-**Status:** Agreed first-version scope; scaffold only. The paragraph wrapping rule is not implemented or published. Research checked on November 8, 2026.
+**Status:** First implementation of the agreed scope; not published yet. Research checked on November 8, 2026.
 
 ## Purpose
 
@@ -49,7 +49,7 @@ Export one ESM plugin object with `meta` and `rules["paragraph-wrap"]`. Use the 
 
 | Option | Accepted Values | Proposed Default |
 | --- | --- | --- |
-| `width` | Positive integer, `"nowrap"`, or `"ignore"` | `120`, following the latest upstream proposal and existing paragraph limit. |
+| `width` | Positive integer, `"nowrap"`, or `"ignore"` | `"ignore"`; omitting `width` leaves paragraphs untouched. |
 
 Reject zero, negative or fractional widths, unsupported keywords, unknown properties, and incorrect types through the rule schema. `"ignore"` skips enforcement; ESLint severity `"off"` disables the entire rule.
 
@@ -57,11 +57,11 @@ Apply the same `width` to every paragraph, including paragraphs inside lists, bl
 
 There is no `ignoreUrls` option or URL-line exemption. Wrap surrounding prose at safe boundaries while keeping URLs intact. If an indivisible URL exceeds the configured width, report without fixing rather than splitting it or ignoring the entire line. URLs need no exception in `"nowrap"` mode.
 
-Do not ship an opinionated recommended preset in the first version. Enable the rule explicitly, and set `width: "nowrap"` for the user's preferred single-line prose. The numeric default remains available for users who enable the rule without options.
+Do not ship an opinionated recommended preset in the first version. Enable the rule explicitly, and set `width: "nowrap"` for the user's preferred single-line prose or a positive integer for numeric wrapping. Enabling the rule without a `width`, including with an empty options object, does nothing.
 
 ### Example Configuration
 
-This is a proposed consumer configuration, not working usage for an already implemented package:
+The public consumer configuration is:
 
 ```js
 import markdown from "@eslint/markdown";
@@ -138,19 +138,23 @@ Report without fixing when safety cannot be established, including multiline lit
 
 ## Integration and Implementation
 
-Use the host's paragraph AST, source ranges, ancestry, and original source text. Traverse public AST children if necessary rather than importing upstream internal helpers. Build one rule with small local helpers for width calculation, segmentation, prefix handling, and safe edits; avoid a generic formatting framework.
+The rule uses the host's paragraph AST, source ranges, ancestry, and original source text. It traverses public AST children rather than importing upstream internal helpers. One rule contains local helpers for display width, segments, proven container prefixes, whitespace boundaries, greedy numeric reflow, and safe edits.
 
-Use public language parse APIs to validate proposed edits against the selected dialect when practical. Compare document structure and inline meaning after normalizing only intended soft-break whitespace and discarding positions, while preserving literal values and hard-break nodes. Unknown syntax or unavailable validation must lead to conservative report-only behavior, not a fallback regex parser. Require fixture-based safety evidence as well; AST equivalence alone is not proof that every renderer behaves identically.
+ESLint's public rule context exposes language options but not the active language object or dialect name. The implementation therefore finds the public `@eslint/markdown` languages whose parses reproduce the original document AST, then requires each proposed edit to preserve that AST under every matching language. It normalizes only soft-break whitespace in text values and discards positions; literal values, inline syntax, hard breaks, and block structure must remain equal. It does not inspect other rules' configuration or import an internal parser.
+
+This deliberately favors safety over fixing coverage. If no public dialect matches the original AST, diagnostics remain report-only throughout the file. Standard syntax under the optional extended language can be fixed when it matches; custom containers and other unmatched extension nodes are report-only. Multiline literals, inline comments, directive-boundary patterns, tab-indented prefixes, and ambiguous edited line endings also prevent fixes. A numeric segment containing an overlong atomic construct receives no partial reflow because the whole proposed correction must be compliant and stable.
+
+Both source/API and packaged CLI file fixtures provide behavioral safety evidence. AST equivalence alone is not proof that every renderer treats soft line breaks identically.
 
 Fixes must be non-overlapping and stabilize on a subsequent ESLint pass. A segment that cannot be made compliant safely remains report-only. Use deterministic diagnostics and localized replacement ranges.
 
 ### Dependencies and Layout
 
-Use JavaScript ESM, npm with a committed `package-lock.json`, and `node --test`. Proposed package layout: `src/index.js`, `src/rules/paragraph-wrap.js`, focused helpers only where needed, `test/`, and integration fixtures. Export the public plugin entry point and define an explicit packaged-file list.
+Use JavaScript ESM, npm with a committed `package-lock.json`, and `node --test`. The package has `src/index.js`, `src/rules/paragraph-wrap.js`, `test/`, shared test support under `test-support/`, and integration file fixtures. Public exports and an explicit packaged-file list exclude development support from the archive.
 
 Registry checks currently report ESLint `10.14.0`, `@eslint/markdown` `8.0.3`, `eslint-plugin-markdown-preferences` `0.43.0`, and `string-width` `8.3.0`; the Node distribution index reports Node `26.13.0` as the latest stable release and LTS. These are research observations, not permanent pins; recheck stable versions during scaffolding.
 
-Use ESLint `^9.39.0 || ^10.0.0` and `@eslint/markdown ^8.0.0` as peer dependencies. Add `string-width` as a direct runtime dependency when implementing numeric wrapping; the scaffold has no runtime dependencies. Add `eslint-plugin-markdown-preferences` as a development dependency when implementing coexistence/extended-syntax integration tests; consumers need it only for those optional integrations. Supported Node versions start at `^22.13.0 || >=24.0.0`, matching the selected host's minimum on the supported Node 22 line rather than adding the older Node 20 line solely because upstream still allows it. Test the minimum supported Node version and the latest stable development runtime, plus both supported ESLint major versions. Use Node.js `26.13.0` for development; documentation spelling tools require at least Node.js 22.18.
+Use ESLint `^9.39.0 || ^10.0.0` and `@eslint/markdown ^8.0.0` as peer dependencies, with `string-width` as a direct runtime dependency. `eslint-plugin-markdown-preferences` is a development dependency for coexistence/extended-syntax integration tests; consumers need it only for those optional integrations. Supported Node versions start at `^22.13.0 || >=24.0.0`, matching the selected host's minimum on the supported Node 22 line rather than adding the older Node 20 line solely because upstream still allows it. Test the minimum supported Node version and the latest stable development runtime, plus both supported ESLint major versions. Use Node.js `26.13.0` for development; documentation spelling tools require at least Node.js 22.18.
 
 The scaffold includes source and embedded-JavaScript linting with ESLint and `@eslint/markdown`, plus markdownlint prose, spelling, single-line-paragraph, and title-case checks. Markdown-source linting and code-block processor linting use separate ESLint invocations because applying the processor replaces the original Markdown input. A small tested YAML-aware checker enforces title case for workflow/job/step display names without checking machine identifiers or arbitrary `name` fields. Test, Lint, and Package workflows remain separate, with coverage and Coveralls.
 
@@ -185,11 +189,11 @@ test/fixtures/integration/
     diagnostics.json
 ```
 
-`case.json` declares the language (`commonmark`, `gfm`, or optional `extended-syntax`), language options, rule options, and whether to enable the existing `max-len` coexistence configuration. Keep metadata declarative and validate it so misspelled fields cannot silently skip coverage. Run each case under its declared dialect; do not indiscriminately apply GFM fixtures to CommonMark.
+`case.json` declares the language (`commonmark`, `gfm`, or optional `extended-syntax`), language options, rule options, and whether to enable the existing `max-len` coexistence configuration. Optional metadata selects severity, an `.md`/`.markdown` consumer filename, or expected configuration failure. The shared loader validates metadata and diagnostic fields so misspellings cannot silently skip coverage. Run each case under its declared dialect; do not indiscriminately apply GFM fixtures to CommonMark.
 
-`input.md` is the original file; `expected.md` is the exact file after fixing. For valid and report-only cases, expected output is identical to input. Check in expected bytes rather than deriving them from the implementation. `diagnostics.json` records expected diagnostics before and after fixing, using stable fields: rule ID, message ID, severity, location, and fix availability. Do not snapshot temporary absolute paths, raw fix ranges, or unrelated CLI metadata.
+`input.md` is the original file; `expected.md` is the exact file after fixing. For valid and report-only cases, expected output is identical to input. Check in expected bytes rather than deriving them from the implementation. `diagnostics.json` records expected diagnostics before and after fixing using message ID, start line/column, and fix availability; optional rule ID/severity override defaults of this plugin's rule and error severity. Do not snapshot temporary absolute paths, raw fix ranges, or unrelated CLI metadata.
 
-The runner installs the actual packed plugin in an owned temporary consumer and generates flat configuration from fixture metadata using public plugin exports. Reuse that installation across cases, but copy each input into an isolated case directory before invoking the real ESLint CLI. Never run `--fix` against checked-in fixtures or import the plugin from the source checkout in these tests. Use argument-array process invocation and capture output and exit status.
+The CLI runner inspects and installs the actual packed plugin in an owned temporary consumer with the matrix-selected ESLint and matching host versions. It generates flat configuration from fixture metadata using public plugin exports. It reuses that installation across cases but copies each input into an isolated case directory before invoking the real ESLint CLI. It never runs `--fix` against checked-in fixtures or imports the plugin from the source checkout. A separate public-API runner exercises the same fixtures against source for focused checks and coverage. Process invocations use argument arrays and capture output and exit status.
 
 For every case, run a check with JSON output and compare diagnostics and the expected success/failure status. Then run `--fix`, compare the resulting Markdown byte-for-byte with `expected.md`, and compare remaining diagnostics. Finally run `--fix` again and assert unchanged bytes and diagnostics. Report-only cases may still exit with lint errors; that is expected, not a runner failure. Assert that check-only invocations leave files unchanged.
 
@@ -203,6 +207,6 @@ Use focused helper tests only for behavior that cannot be expressed clearly thro
 
 The first implementation includes numeric wrapping and `"nowrap"` together, one width policy for all paragraphs, safe fixes, documentation, and real host/package tests. Non-goals are container-specific policies, upstream deprecation work, a full Markdown formatter, semantic sentence wrapping, MDX or arbitrary renderer support, and automatic cross-rule conflict resolution.
 
-The agreed first-version scope combines numeric wrapping and `"nowrap"`, with a default width of `120`, no container-specific options, and no URL exemptions. The implementation follows scaffold review and explicit approval.
+The agreed first-version scope combines numeric wrapping and `"nowrap"`, with no checks when `width` is omitted, no container-specific options, and no URL exemptions. The scaffold PR has merged, and this implementation is the next focused PR.
 
-The design and README-only bootstrap on `master` have been authorized. Create and validate the scaffold in a separate topic worktree and open its PR, then pause for explicit approval before implementing and opening a focused implementation PR. No merging, publication, release tags, or artwork is authorized.
+Validate and open the implementation PR from its separate worktree, then pause for explicit approval. No additional merging, publication, release tags, or artwork is authorized.

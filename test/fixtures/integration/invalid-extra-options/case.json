@@ -1,0 +1,1 @@
+{ "language": "commonmark", "options": { "width": "nowrap", "list": 80, "blockquote": 80, "footnoteDefinition": 80, "ignoreUrls": true }, "configurationError": true }

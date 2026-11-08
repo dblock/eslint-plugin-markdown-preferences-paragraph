@@ -1,0 +1,4 @@
+test/fixtures/integration/crlf/*.md -text
+test/fixtures/integration/mixed-endings/*.md -text
+test/fixtures/integration/numeric-mixed-eof/*.md -text
+test/fixtures/integration/**/*.md whitespace=-blank-at-eol

@@ -1,0 +1,7 @@
+{
+  "before": [
+    { "messageId": "width", "line": 1, "column": 1, "fixable": true },
+    { "messageId": "width", "line": 2, "column": 1, "fixable": false }
+  ],
+  "after": []
+}

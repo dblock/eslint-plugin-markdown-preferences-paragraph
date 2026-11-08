@@ -1,0 +1,14 @@
+{
+  "before": [
+    { "messageId": "nowrap", "line": 1, "column": 1, "fixable": true },
+    { "messageId": "nowrap", "line": 3, "column": 1, "fixable": true },
+    { "messageId": "nowrap", "line": 6, "column": 1, "fixable": true },
+    { "messageId": "nowrap", "line": 8, "column": 1, "fixable": true },
+    { "messageId": "nowrap", "line": 11, "column": 1, "fixable": true },
+    { "messageId": "nowrap", "line": 13, "column": 1, "fixable": true },
+    { "messageId": "nowrap", "line": 17, "column": 1, "fixable": true },
+    { "messageId": "nowrap", "line": 20, "column": 1, "fixable": true },
+    { "messageId": "nowrap", "line": 23, "column": 1, "fixable": true }
+  ],
+  "after": []
+}

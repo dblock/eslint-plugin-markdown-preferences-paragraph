@@ -1,6 +1,6 @@
 # Contributing
 
-Read [Design](DESIGN.md) and [Automated Contributor Instructions](AGENTS.md). The project is a scaffold; paragraph wrapping is not implemented yet.
+Read [Design](DESIGN.md) and [Automated Contributor Instructions](AGENTS.md). The rule supports numeric wrapping and unwrapping through one paragraph-wide policy.
 
 ## Setup and Validation
 
@@ -14,19 +14,19 @@ npm run test:coverage
 npm run package:check
 ```
 
-Run `npm test` and `npm run lint` before every push, including updates to a PR. Run final checks before committing and reuse results for the push when tested content/configuration has not changed. Run `npm run package:check` before committing packaging/public-entry-point changes; it creates an archive with `npm pack`, inspects its contents, installs that exact archive in a temporary consumer, and runs the real ESLint CLI.
+Run `npm test` and `npm run lint` before every push, including updates to a PR. Run final checks before committing and reuse results for the push when tested content/configuration has not changed. Validate packaging/public-entry-point changes with the packaged CLI fixture suite: it creates an archive with `npm pack`, inspects its contents, installs that exact archive in a temporary consumer, and runs the real ESLint CLI. `npm test` already runs this suite; `npm run package:check` selects it alone, so do not immediately repeat it after a passing full test run.
 
 `npm run lint:code` checks source and embedded JavaScript examples. `npm run lint:markdown` separately checks Markdown source, prose, spelling, single-line paragraphs, and title-case headings. `npm run lint:workflows` parses YAML and checks title case only for workflow, job, and step display names. Machine identifiers, expressions, and arbitrary `name` fields are not capitalization targets.
 
 Keep human-readable Markdown headings and YAML display names in title case, preserving proper names and code identifiers. Keep each Markdown prose paragraph on one source line. Review `.spellcheck.txt` additions and fix typos instead of adding them to the dictionary. Intentionally invalid file fixtures are not project documentation.
 
-Test, Lint, and Package have separate CI workflows. Tests cover minimum/current Node versions and supported ESLint majors; a current-Node coverage job reports to Coveralls. No Danger checks are configured for this JavaScript project.
+Test, Lint, and Package have separate CI workflows. Tests cover minimum/current Node versions and supported ESLint majors using explicit inline `matrix.entry` records without `include`/`exclude`; a current-Node coverage job reports to Coveralls. ESLint 9 compatibility is retained for existing Markdown setups while development and lint use current ESLint 10. No Danger checks are configured for this JavaScript project.
 
 ## Tests
 
-Run a focused test with `node --test test/plugin.test.js`. Tests in `test/` currently exercise public plugin loading, Markdown heading-rule integration, and the YAML display-name checker. `test/fixtures/scaffold/input.md` is an unchanged consumer smoke fixture, not evidence that wrapping works.
+Run focused API fixture tests with `node --test test/plugin.test.js` or the packed CLI suite with `npm run package:check`. Tests also exercise Markdown heading-rule integration and the YAML display-name checker.
 
-Implementation integration tests will use [data-driven file fixtures](DESIGN.md#data-driven-file-fixtures): metadata, original Markdown, expected fixed Markdown, and stable before/after diagnostics. Run the real ESLint CLI against the packed plugin, compare exact bytes and exit status, and verify second-pass stability without mutating checked-in fixtures. Add focused helper tests only for behavior that is not clearly expressed by file fixtures.
+Both API and CLI tests use the same [data-driven file fixtures](DESIGN.md#data-driven-file-fixtures): metadata, original Markdown, expected fixed Markdown, and stable before/after diagnostics. The CLI suite uses the actual packed plugin with the matrix-selected ESLint version, compares exact bytes and exit status, and verifies second-pass stability without mutating checked-in fixtures. Add cases through fixture files, not case-specific runner branches. Preserve CRLF/mixed endings through `.gitattributes` and the missing-final-newline fixture's bytes. Add focused helper tests only for behavior that is not clearly expressed by file fixtures.
 
 ## Pull Requests
 
