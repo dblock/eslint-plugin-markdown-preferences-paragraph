@@ -44,13 +44,13 @@ Overrides cannot be older than the checked-in version. Prerelease versions are n
 
 ## Automated Sequence
 
-Actions checks out the exact dispatched commit and runs only on `master` in the restricted release environment, using the pinned Node runtime. Hooks require a clean installation, meaningful release notes, an unpublished version, and an absent tag. Release-it updates version declarations; hooks date the Next section in UTC and remove its placeholder while preserving prior entries.
+Actions checks out the exact dispatched commit and runs only on `master` in the restricted release environment, using the pinned Node runtime. Hooks require a clean installation, meaningful release notes, an unpublished version, and an absent tag. Release-it updates version declarations; hooks date the Next section in UTC, remove its placeholder while preserving prior entries, and update the README npm installation pin to the release version before packing.
 
-The hooks pack once to `.release/package.tgz`, retain a checksum and metadata patch, run lint, and pass that exact archive to the full tests through `PARAGRAPH_WRAP_PACKAGE_ARCHIVE`. The real consumer suite inspects and installs it, checks version and logo integrity, and exercises ESLint check/fix/stability fixtures. Only version fields in package metadata and the changelog may change. Immediately before publication, hooks reject changed metadata/artifacts or an advanced remote `master`.
+The hooks pack once to `.release/package.tgz`, retain a checksum and metadata patch, run lint, and pass that exact archive to the full tests through `PARAGRAPH_WRAP_PACKAGE_ARCHIVE`. The real consumer suite inspects and installs it, checks version and logo integrity, and exercises ESLint check/fix/stability fixtures. Release changes are limited to package version fields, the changelog, and README. Immediately before publication, hooks reject changed metadata/artifacts or an advanced remote `master`.
 
 Release-it's native npm publisher publishes that retained tarball through OIDC, without repacking. Its native Git plugin then commits the metadata, creates the annotated tag, and atomically pushes the commit/tag. Before creating the GitHub Release, a hook verifies that the remote branch/tag match the release commit and that the registry version/integrity match the validated archive. Release-it attaches the tarball/checksum to the GitHub Release.
 
-After publication and GitHub Release creation succeed, a second release-it run increments patch, creates the new Next section and placeholder through its changelog hook, runs lint and full tests for that next version, and commits/pushes its metadata. This run does not publish, create tags, or create another GitHub Release. No ordinary development commits are authorized to bypass PRs.
+After publication and GitHub Release creation succeed, a second release-it run increments patch, creates the new Next section and placeholder through its changelog hook, runs lint and full tests for that next version, and commits/pushes its metadata. The README installation pin stays at the released version, not the unpublished development version. This run does not publish, create tags, or create another GitHub Release. No ordinary development commits are authorized to bypass PRs.
 
 ## Failure Recovery
 

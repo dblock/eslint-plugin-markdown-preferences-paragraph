@@ -6,14 +6,10 @@
 
 An ESLint plugin for checking and safely fixing Markdown paragraph wrapping, inspired by [eslint-plugin-markdown-preferences#338](https://github.com/ota-meshi/eslint-plugin-markdown-preferences/issues/338).
 
-**Status:** First implementation; not published to npm yet.
-
 ## Installation
 
-Run `npm pack` from this checkout, then install the resulting tarball in your consuming project until an npm release is published:
-
 ```sh
-npm install --save-dev eslint @eslint/markdown /path/to/eslint-plugin-markdown-preferences-paragraph-wrap-0.1.0.tgz
+npm install --save-dev eslint @eslint/markdown eslint-plugin-markdown-preferences-paragraph-wrap@0.1.0
 ```
 
 Requires Node.js 22.13 or a supported newer version, ESLint 9.39 or 10.x, and `@eslint/markdown` 8.x.
@@ -27,24 +23,75 @@ import markdown from "@eslint/markdown";
 import paragraphWrap from "eslint-plugin-markdown-preferences-paragraph-wrap";
 
 export default [{
-  files: ["**/*.md", "**/*.markdown"],
-  plugins: { markdown, "markdown-preferences-paragraph-wrap": paragraphWrap },
+  files: ["**/*.md"],
+  plugins: { markdown, paragraphWrap },
   language: "markdown/gfm",
   rules: {
-    "markdown-preferences-paragraph-wrap/paragraph-wrap": ["error", { width: "nowrap" }],
+    "paragraphWrap/paragraph-wrap": ["error", { width: 80 }],
   },
 }];
 ```
 
-Check with `npx eslint "**/*.md" "**/*.markdown"`; add `--fix` to safely join soft-wrapped paragraphs, including paragraphs in lists, blockquotes, and GFM footnotes. Intentional Markdown hard breaks and line-boundary `<br>` tags remain separate.
+Check Markdown paragraphs against an 80-column width:
+
+```sh
+npx eslint "**/*.md"
+```
 
 ## Configuration
 
-The only option is `width`: a positive integer wraps overlong source lines, `"nowrap"` joins soft line breaks without a width limit, and `"ignore"` skips paragraph checks. Omitting `width` also skips checks and leaves paragraphs untouched. One policy applies to every paragraph; there are no container overrides, URL exemptions, or recommended presets.
+The rule accepts one option, `width`:
 
-Numeric widths include source markup and container prefixes, Unicode display width, and four-column tab stops. Safe paragraph segments reflow to the configured width, even if their existing lines already fit: changing `width` from `30` to `80` and running `--fix` fills the wider lines. Already canonical wrapping stays untouched, and intentional hard breaks remain separate. URLs and indivisible inline constructs are never split; unsafe or impossible corrections to overlong lines report without a fix. See [Fix Safety](DESIGN.md#integration-and-implementation) for conservative limitations.
+| Value | Behavior |
+| --- | --- |
+| Positive integer, such as `80` | Check paragraph width and safely reflow to that width. |
+| `"nowrap"` | Check for soft line breaks and safely join them without a width limit. |
+| `"ignore"` | Skip paragraph checks and fixes. |
+| Omitted (default) | Skip paragraph checks and fixes. |
 
-If you also use `markdown-preferences/max-len`, explicitly ignore its paragraph checks at the root and in containers as shown in [Coexistence](DESIGN.md#coexistence-with-existing-length-rules). Disable markdownlint `MD013` when enforcing unrestricted `"nowrap"`.
+One width policy applies to every paragraph, including paragraphs in lists, blockquotes, and GFM footnotes. There are no container-specific widths, URL exemptions, or recommended presets.
+
+Numeric widths include source markup and container prefixes, Unicode display width, and four-column tab stops.
+
+## Fixing
+
+Apply safe paragraph fixes with ESLint:
+
+```sh
+npx eslint "**/*.md" --fix
+```
+
+Numeric widths reflow paragraphs to the configured width; `"nowrap"` joins soft line breaks. Intentional hard breaks remain separate, and words, URLs, and inline constructs are never split. Unsafe or impossible corrections report without a fix; see [Fix Safety](DESIGN.md#integration-and-implementation).
+
+Safe paragraph segments reflow even if their existing lines already fit: changing `width` from `30` to `80` fills the wider lines when fixing. Already canonical wrapping stays untouched.
+
+## Interoperability
+
+### [`markdown-preferences`](https://github.com/ota-meshi/eslint-plugin-markdown-preferences)
+
+With the plugin registered as `markdownPreferences`, configure `max-len` to skip paragraphs at the root and in containers. For example, retain an 80-column heading limit:
+
+```json
+{
+  "markdownPreferences/max-len": ["error", {
+    "heading": 80,
+    "paragraph": "ignore",
+    "list": { "paragraph": "ignore" },
+    "blockquote": { "paragraph": "ignore" },
+    "footnoteDefinition": { "paragraph": "ignore" }
+  }]
+}
+```
+
+### [markdownlint](https://github.com/DavidAnson/markdownlint)
+
+Disable markdownlint `MD013` when enforcing unrestricted `"nowrap"`. In `.markdownlint.json`:
+
+```json
+{
+  "MD013": false
+}
+```
 
 ## Contributing
 
