@@ -1,0 +1,8 @@
+{
+  "before": [
+    { "ruleId": "markdown/no-html", "line": 3, "fixable": false }
+  ],
+  "after": [
+    { "ruleId": "markdown/no-html", "line": 3, "fixable": false }
+  ]
+}

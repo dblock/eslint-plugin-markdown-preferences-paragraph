@@ -4,6 +4,7 @@ Coveralls
 ESLint's
 ESM
 GFM
+LTS
 SVG
 RuboCop
 UTF
@@ -15,6 +16,7 @@ dblock
 intraline
 js
 maintainer's
+markdownlint
 mdformat
 nowrap
 overlong

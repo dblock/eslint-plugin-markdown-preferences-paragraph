@@ -25,7 +25,7 @@
     "test:coverage": "c8 --reporter=text --reporter=lcov npm test",
     "lint": "npm run lint:code && npm run lint:markdown && npm run lint:workflows",
     "lint:code": "eslint .",
-    "lint:markdown": "eslint --config eslint.config-markdown.js \"*.md\" && markdownlint-cli2 \"*.md\"",
+    "lint:markdown": "eslint --config eslint.config-markdown.js \"*.md\"",
     "lint:workflows": "node scripts/check-workflow-names.js",
     "package:check": "node --test test/integration.test.js"
   },
@@ -43,12 +43,7 @@
     "c8": "^12.0.0",
     "eslint": "^10.14.0",
     "eslint-plugin-markdown-preferences": "^0.43.0",
-    "markdown-it": "^15.0.3",
-    "markdownlint": "^0.42.0",
-    "markdownlint-cli2": "^0.24.0",
-    "markdownlint-rule-single-line-paragraphs": "^0.2.0",
-    "markdownlint-rule-spellcheck": "^0.2.0",
-    "markdownlint-rule-title-case-style": "^0.4.3",
+    "cspell-lib": "^10.4.1",
     "title-case": "^4.3.2",
     "yaml": "^2.9.1"
   },
@@ -72,7 +67,7 @@
   "c8": {
     "include": [
       "src/**/*.js",
-      "scripts/check-workflow-names.js"
+      "scripts/**/*.js"
     ]
   }
 }
