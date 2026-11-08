@@ -22,7 +22,7 @@ export function configuration(fixture, { markdown, preferences, plugin }) {
       : `markdown/${fixture.language}`,
     languageOptions: fixture.languageOptions ?? {},
     rules: {
-      [`${namespace}/paragraph-wrap`]: [
+      [`${namespace}/wrap`]: [
         fixture.severity ?? "error",
         ...(fixture.options === undefined ? [] : [fixture.options]),
       ],

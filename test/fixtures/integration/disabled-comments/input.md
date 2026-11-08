@@ -1,13 +1,13 @@
-<!-- eslint-disable paragraph/paragraph-wrap -->
+<!-- eslint-disable paragraph/wrap -->
 
 This paragraph stays
 on two lines.
 
-<!-- eslint-enable paragraph/paragraph-wrap -->
+<!-- eslint-enable paragraph/wrap -->
 
 This paragraph joins
 on one line.
 
-<!-- eslint-disable-next-line paragraph/paragraph-wrap -->
+<!-- eslint-disable-next-line paragraph/wrap -->
 This paragraph stays
 on two lines.

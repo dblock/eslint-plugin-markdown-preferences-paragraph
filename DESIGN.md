@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Create `eslint-plugin-markdown-preferences-paragraph`, an independent, opt-in ESLint plugin that checks and safely fixes Markdown paragraph wrapping. Support both positive numeric widths and `"nowrap"` in one `paragraph-wrap` rule, without becoming a general Markdown formatter.
+Create `eslint-plugin-markdown-preferences-paragraph`, an independent, opt-in ESLint plugin that checks and safely fixes Markdown paragraph wrapping. Support both positive numeric widths and `"nowrap"` in one `wrap` rule, without becoming a general Markdown formatter.
 
 [To Wrap or Not to Wrap in Markdown?](https://code.dblock.org/2021/06/07/to-wrap-or-not-to-wrap-in-markdown.html) motivates one source line per paragraph: arbitrary reflow can turn a small wording edit into changes across several lines. This is a source-format preference, not a guarantee that all Markdown renderers treat soft line breaks identically.
 
@@ -43,7 +43,7 @@ This project follows the separate `paragraph-wrap` direction but cannot deprecat
 
 Use the repository and npm package name `eslint-plugin-markdown-preferences-paragraph`, under GitHub owner `dblock`. Before this pre-release rename on November 8, 2026, the GitHub repository lookup found no repository, and npm returned `E404` for the unscoped package name; these checks suggest availability but do not reserve the names or guarantee registry acceptance.
 
-Export one ESM plugin object with `meta` and `rules["paragraph-wrap"]`. Register it as `paragraph` to use `paragraph/paragraph-wrap`; the namespace is an ESLint configuration alias, not part of the exported rule name. There is no standalone CLI, replacement parser, fork of the upstream plugin, or automatic activation of unrelated rules.
+Export one ESM plugin object with `meta` and `rules.wrap`. Register it as `paragraph` to use `paragraph/wrap`; the namespace is an ESLint configuration alias, not part of the exported rule name. There is no standalone CLI, replacement parser, fork of the upstream plugin, or automatic activation of unrelated rules.
 
 ### Options
 
@@ -76,7 +76,7 @@ export default [
     },
     language: "markdown/gfm",
     rules: {
-      "paragraph/paragraph-wrap": [
+      "paragraph/wrap": [
         "error",
         { width: "nowrap" },
       ],
@@ -152,7 +152,7 @@ Fixes must be non-overlapping and stabilize on a subsequent ESLint pass. A segme
 
 ### Dependencies and Layout
 
-Use JavaScript ESM, npm with a committed `package-lock.json`, and `node --test`. The package has `src/index.js`, `src/rules/paragraph-wrap.js`, `test/`, shared test support under `test-support/`, and integration file fixtures. Public exports and an explicit packaged-file list exclude development support from the archive.
+Use JavaScript ESM, npm with a committed `package-lock.json`, and `node --test`. The package has `src/index.js`, `src/rules/wrap.js`, `test/`, shared test support under `test-support/`, and integration file fixtures. Public exports and an explicit packaged-file list exclude development support from the archive.
 
 Registry checks currently report ESLint `10.14.0`, `@eslint/markdown` `8.0.3`, `eslint-plugin-markdown-preferences` `0.43.0`, and `string-width` `8.3.0`; the Node distribution index reports Node `26.13.0` as the latest stable release and LTS. These are research observations, not permanent pins; recheck stable versions during scaffolding.
 
@@ -162,7 +162,7 @@ Development linting uses ESLint throughout JavaScript and Markdown. `@eslint/mar
 
 Native Markdown spelling uses a local ESLint rule backed by public `cspell-lib` dictionary and text-extraction APIs, with US English, software terminology, and the existing `.spellcheck.txt` vocabulary. CSpell's ESLint plugin currently visits only JavaScript `Program` nodes, so enabling it on the Markdown AST would silently skip prose. The native rule checks text nodes rather than URLs or inline/fenced code, preserves original UTF-16 source offsets, and never rewrites spelling or mutates third-party rules/ASTs. Two small native rules retain first-level-one-heading and final-newline checks; comments and standalone logo images may precede the heading. HTML allowances are limited to `img` elements. The style configuration keeps the prior allowance for both Markdown hard-break forms and unaligned table columns.
 
-Documentation file fixtures load the actual Markdown and embedded-code ESLint configs and verify valid/invalid headings, spelling and Unicode locations, public paragraph-wrap fixes, structural errors, final-newline fixes, ignored test fixtures, and literal/code exclusions. These development-tool checks require Node 22.18 or later, independently of the package's lower runtime minimum.
+Documentation file fixtures load the actual Markdown and embedded-code ESLint configs and verify valid/invalid headings, spelling and Unicode locations, public `wrap` fixes, structural errors, final-newline fixes, ignored test fixtures, and literal/code exclusions. These development-tool checks require Node 22.18 or later, independently of the package's lower runtime minimum.
 
 ## Release Automation
 

@@ -1,7 +1,7 @@
 {
   "before": [
     { "ruleId": "markdown-preferences/heading-casing", "line": 1, "fixable": true },
-    { "ruleId": "paragraph/paragraph-wrap", "line": 3, "fixable": true },
+    { "ruleId": "paragraph/wrap", "line": 3, "fixable": true },
     { "ruleId": "documentation/spelling", "line": 3, "column": 7, "fixable": false }
   ],
   "after": [{ "ruleId": "documentation/spelling", "line": 3, "column": 7, "fixable": false }]

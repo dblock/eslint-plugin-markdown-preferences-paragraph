@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 
-const ruleId = "paragraph/paragraph-wrap";
+const ruleId = "paragraph/wrap";
 
 export function diagnostics(messages) {
   return messages.map((message) => ({

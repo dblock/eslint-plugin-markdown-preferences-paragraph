@@ -27,7 +27,7 @@ export default [{
   plugins: { markdown, paragraph },
   language: "markdown/gfm",
   rules: {
-    "paragraph/paragraph-wrap": ["error", { width: 80 }],
+    "paragraph/wrap": ["error", { width: 80 }],
   },
 }];
 ```
