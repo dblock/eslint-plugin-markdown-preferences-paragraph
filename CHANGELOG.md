@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 (Next)
+
+- Your contribution here.
+
 ## 0.1.0 (2026/11/08)
 
 - [#2](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/2): Add opt-in numeric paragraph wrapping and unwrapping, leaving paragraphs untouched when width is omitted, with data-driven file-fixture, packaged ESLint, and workflow-checker CLI tests - [@dblock](https://github.com/dblock).
