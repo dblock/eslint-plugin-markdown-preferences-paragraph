@@ -1,51 +1,36 @@
 # Releasing
 
-Use **Actions > Release > Run workflow** on `master`. A dispatch requests a real release; there is no dry-run input. Opening or merging the workflow setup PR does not authorize publication. Finish the one-time setup and review the candidate before dispatching.
+Use **Actions > Release > Run workflow** on `master` only after explicit release authorization. Dispatch publishes a real release; opening or merging a PR does not authorize publication.
+
+## Release Tooling
+
+The manual caller in `.github/workflows/release.yml` uses [npm-package-release](https://github.com/dblock/npm-package-release) `v0.1.1`, matching the exact development dependency. Upgrade the dependency and reusable workflow together. Release validation uses Node.js 26.13.0 and npm 12.2.2; the plugin's public runtime requirements are unchanged.
+
+`npr.config.js` selects `IntrideaChangelog` for `## <version> (Next)` and `- Your contribution here.`. Its preparation hook updates only the README Installation section to the released version; next-development preparation leaves that pin unchanged. Default validation runs `npm test` and `npm run lint`. The artifact validator runs `npm run package:check` with `PACKAGE_ARCHIVE` pointing at the exact retained archive, exercising installed ESLint check/fix/stability fixtures rather than rebuilding it.
+
+Keep package/lockfile versions and the Next heading synchronized, with meaningful release notes above the placeholder. The checked-in version is the default release candidate; an optional numeric version overrides it.
 
 ## Trusted Publishing
 
-The package is already published on npm. Releases use the configured GitHub Actions trusted publisher; no bootstrap, staging, or stored npm token is needed.
-
-The connection in **Package > Settings > Trusted Publisher** must match:
+The package already exists on npm. Keep the existing GitHub Actions trusted publisher; no bootstrap or stored npm token is needed:
 
 | Setting | Value |
 | --- | --- |
-| Publisher | GitHub Actions |
 | Organization or User | `dblock` |
 | Repository | `eslint-plugin-markdown-preferences-paragraph` |
-| Workflow Filename | `release.yml` |
+| Workflow Filename | `release.yml`, the caller filename |
 | Environment | `release` |
-| Direct Publishing | Enabled: `npm publish` |
+| Direct Publishing | Enabled |
 
-Use npm 11.15.0 or later with a compatible Node version to configure or inspect the connection. Complete browser 2FA locally; never share codes or tokens. If the connection is missing, create it with:
+Trusted publication was verified for 0.2.0 on 2026/11/08: registry bytes, GitHub Release archive/checksum, and the release commit agree. Provenance identifies this repository and [run 42528405739](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/runs/42528405739). That connection satisfied its first-publication requirement. The reusable-workflow migration keeps the caller filename and environment; its first actual OIDC publication remains untested until an authorized release.
 
-```sh
-npm trust github eslint-plugin-markdown-preferences-paragraph \
-  --repo dblock/eslint-plugin-markdown-preferences-paragraph \
-  --file release.yml --env release --allow-publish
-```
+The `release` environment allows only `master`. The approved direct-push setup allows all writers to push, not only Actions; ordinary development still requires PRs. Force-push and branch-deletion protections remain active without bypass actors. The caller grants `contents: write` and `id-token: write`; no npm token or `NODE_AUTH_TOKEN` is configured.
 
-Verify the repository, filename, environment, and direct-publish permission:
+Changing publisher settings, credentials, or protections requires separate authorization. If a new connection is required, follow the tool's [setup instructions](https://github.com/dblock/npm-package-release/blob/v0.1.1/docs/usage.md#new-project-setup), complete browser 2FA locally, and verify its current expiry policy; never share tokens or codes.
 
-```sh
-npm trust list eslint-plugin-markdown-preferences-paragraph
-```
+## Validate and Dispatch
 
-Stage-only permission is insufficient: this workflow publishes directly and does not wait for human approval of a staged package. A new connection must complete its first successful publish within two days or expire. Recreate an expired connection before an authorized release; configuration alone does not prove that OIDC publication succeeds.
-
-Trusted publication was verified for 0.2.0 on 2026/11/08: npm identifies the GitHub trusted publisher, and provenance identifies this repository, `release.yml`, `master`, and [run 42528405739](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/actions/runs/42528405739). Registry bytes match the GitHub Release archive, its checksum, and the `v0.2.0` commit. The connection has satisfied its first-publication requirement; the run failed afterward during next-version validation, not publication.
-
-The GitHub `release` environment is configured for only `master`, without required reviewers. Writers can dispatch releases; add maintainer reviewers if approval before publication is desired. The approved no-App setup removes the default branch's PR requirement, allowing all writers to push directly, while preserving active force-push and deletion protections without bypass actors. Ordinary development must still use PRs.
-
-The workflow uses Node 26.13.0 and requires npm 11.5.1 or later. It uses the built-in `GITHUB_TOKEN` for Git and GitHub Releases, with `contents: write` and `id-token: write`. No GitHub App, stored npm token, or `NODE_AUTH_TOKEN` is needed. npm automatically supplies provenance for this public package and repository.
-
-After verifying trusted publication, select **Require two-factor authentication and disallow tokens** in npm publishing-access settings. This does not disable OIDC. Never put registry credentials into the repository or this conversation.
-
-## Prepare and Dispatch
-
-Keep `package.json`, `package-lock.json`, and `## <version> (Next)` synchronized. Feature PRs choose their version according to the contributor policy; the workflow defaults to that checked-in version and automatically prepares the next patch after release. Require actual changelog entries, not just `- Your contribution here.`.
-
-Run local validation and confirm the separate Test, Lint, and Package checks before requesting publication:
+Before requesting publication, run local checks and review the separate Test, Lint, and Package CI results:
 
 ```sh
 npm ci
@@ -53,36 +38,22 @@ npm run test:coverage
 npm run lint
 ```
 
-The coverage command includes real packed-package CLI consumers; do not immediately repeat `package:check`. Release-tool tests use isolated Git repositories and simulated npm responses, never actual publication.
+The coverage command includes actual packed consumers and an isolated release simulation with local Git and simulated publication, never npm publishing.
 
-After explicit release authorization, dispatch from `master`:
-
-```sh
-gh workflow run release.yml --repo github.com/dblock/eslint-plugin-markdown-preferences-paragraph --ref master
-```
-
-To override the checked-in version, provide a stable version without a `v` prefix:
+After explicit authorization:
 
 ```sh
-gh workflow run release.yml --repo github.com/dblock/eslint-plugin-markdown-preferences-paragraph --ref master -f version=0.2.0
+gh workflow run release.yml --repo dblock/eslint-plugin-markdown-preferences-paragraph --ref master
 ```
 
-Overrides cannot be older than the checked-in version. Prerelease versions are not supported. Concurrent release runs are serialized, and source changes after dispatch cause failure rather than rebasing or overwriting another writer.
+To select a numeric override, append `-f version=0.2.1`, choosing an unpublished version. Do not run `npm run release` as a dry run: it invokes `npr release` and can publish. No release is dispatched automatically on merge.
 
-## Automated Sequence
+## Sequence and Recovery
 
-Actions checks out the exact dispatched commit and runs only on `master` in the restricted release environment, using the pinned Node runtime. Hooks require a clean installation, meaningful release notes, an unpublished version, and an absent tag. Release-it updates version declarations; hooks date the Next section in UTC, remove its placeholder while preserving prior entries, and update the README npm installation pin to the release version before packing.
+The reusable workflow requires manual dispatch on the default branch and uses the `release` environment and non-canceling repository concurrency. It prepares and validates the release, builds the archive and recovery bundle, and requires a successful artifact upload before publication.
 
-The hooks pack once to `.release/package.tgz`, retain a checksum and metadata patch, run lint, and pass that exact archive to the full tests through `PARAGRAPH_WRAP_PACKAGE_ARCHIVE`. The real consumer suite inspects and installs it, checks version and logo integrity, and exercises ESLint check/fix/stability fixtures. Release changes are limited to package version fields, the changelog, and README. Immediately before publication, hooks reject changed metadata/artifacts or an advanced remote `master`.
+Publication independently repeats preparation and reconciles matching outputs. It publishes the tested archive through OIDC, atomically pushes the matching release commit/tag, creates the GitHub Release, validates and pushes the next development patch, then confirms the explicit released version and retained archive against npm. Missing-version propagation uses bounded retries and records an unverified timeout without blocking GitHub Releases or development preparation; other errors remain failures.
 
-Release-it's native npm publisher publishes that retained tarball through OIDC, without repacking. Its native Git plugin then commits the metadata, creates the annotated tag, and atomically pushes the commit/tag. Before creating the GitHub Release, a hook verifies that the remote branch/tag match the release commit. Release-it attaches the validated tarball/checksum to the GitHub Release; registry confirmation is not a prerequisite.
+Prepared and final diagnostic artifacts are uploaded separately and retained for 30 days, including hidden files. Preserve the complete artifact directory: `release.json`, archive, notes, `release.bundle`, and `next.bundle` when present. Unlike the old workflow, recovery is not based on `.release/metadata.patch`. Read the run summary and [recovery contract](https://github.com/dblock/npm-package-release/blob/v0.1.1/docs/recovery.md) before acting.
 
-After publication and GitHub Release creation succeed, a second release-it run increments patch, creates the new Next section and placeholder through its changelog hook, runs lint and full tests for that next version, and commits/pushes its metadata. The README installation pin stays at the released version, not the unpublished development version. This run does not publish, create tags, or create another GitHub Release. No ordinary development commits are authorized to bypass PRs.
-
-Only afterward does the workflow confirm the released version and archive integrity against fresh online npm metadata. Missing-version `E404` responses are retried with up to 36 lookups and five-second waits, roughly three minutes plus request time. Exhaustion records an unverified warning in the job summary and retained `.release/verification.txt`, without failing the workflow or blocking development. Check npm again later; never republish merely because confirmation timed out. Authentication, network, malformed metadata, version mismatch, and integrity mismatch errors remain failures.
-
-## Failure Recovery
-
-Download the run's release artifacts before retention expires: the tarball, checksum, and release metadata patch are retained for 14 days even when later stages fail. The uploader includes hidden files only under `.release/`. Do not blindly rerun a failed release; its tag or npm version may already exist, and the workflow deliberately rejects duplicates. Native destructive rollback handlers are disabled; prepared metadata is not reset on failure.
-
-Check the remote tag/commit, npm version and `dist.integrity`, GitHub Release, and current `master` before choosing recovery. npm is published before Git is pushed: if Git fails after successful publication, reconstruct the release metadata from the exact dispatched source and retained patch, reconcile any newer work without overwriting it, and finish the missing commit/tag push only with explicit authorization. If npm publication failed, investigate authentication and use the original validated tarball through an explicitly authorized workflow or interactive publication. Registry visibility can lag; verify it before treating a missing lookup as a failed publication. If only the GitHub Release or next-version preparation failed, finish those missing steps. Never overwrite registry versions, force-push `master`, delete release tags, unpublish, or reset another writer's work.
+Never blindly rerun publication. Inspect registry version/checksums, remote refs, hosted releases, and retained evidence first; a failed command can follow successful publication. `npm exec --offline -- npr verify --artifacts /path/to/retained-directory` verifies without publishing or modifying refs. Any retry or completion of missing release steps requires authorization. Never republish an existing version, move/delete release tags, force-push `master`, or reset another writer's work.

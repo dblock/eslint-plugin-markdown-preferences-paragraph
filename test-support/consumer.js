@@ -10,15 +10,15 @@ import markdown from "@eslint/markdown";
 import preferences from "eslint-plugin-markdown-preferences";
 import { diagnostics } from "./fixtures.js";
 
-export async function consumer(archivePath = process.env.PARAGRAPH_WRAP_PACKAGE_ARCHIVE) {
+export async function consumer(archivePath = process.env.PACKAGE_ARCHIVE ?? process.env.PARAGRAPH_WRAP_PACKAGE_ARCHIVE) {
   const directory = await mkdtemp(join(tmpdir(), "paragraph-wrap-consumer-"));
   const root = fileURLToPath(new URL("../", import.meta.url));
   const npm = process.platform === "win32" ? "npm.cmd" : "npm";
   try {
-    const [archive] = archivePath ? [{ filename: archivePath }] : JSON.parse(execFileSync(
+    const [archive] = archivePath ? [{ filename: archivePath }] : Object.values(JSON.parse(execFileSync(
       npm, ["pack", "--json", "--pack-destination", directory],
       { cwd: root, encoding: "utf8" },
-    ));
+    )));
     const paths = archivePath ? execFileSync("tar", ["-tzf", archivePath], { encoding: "utf8" })
       .trim().split("\n").map((path) => path.replace(/^package\//u, ""))
       : archive.files.map((file) => file.path);
