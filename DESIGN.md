@@ -46,7 +46,7 @@ Each directory under `test/fixtures/integration/` contains `case.json`, `input.m
 
 Shared API and packaged CLI runners check diagnostics and exit status, run `--fix`, compare expected bytes, then run `--fix` again to verify stability. Report-only cases retain their original bytes and lint errors. Preserve intentional line endings through `.gitattributes` and keep invalid fixtures outside documentation linting.
 
-The consumer suite inspects and installs the actual npm archive in a temporary project and imports its public exports, never the source checkout. `PARAGRAPH_WRAP_PACKAGE_ARCHIVE` selects the exact archive prepared for release. See [Contributing](CONTRIBUTING.md) for commands and coverage expectations.
+The consumer suite inspects and installs the actual npm archive in a temporary project and imports its public exports, never the source checkout. `PACKAGE_ARCHIVE` selects the exact archive prepared for release, with `PARAGRAPH_WRAP_PACKAGE_ARCHIVE` retained as a fallback. Empty overrides mean fresh packing. See [Contributing](CONTRIBUTING.md) for commands and coverage expectations.
 
 ## Development Tooling
 
@@ -58,9 +58,9 @@ Test, Lint, and Package workflows remain separate. Compatibility tests cover the
 
 ## Release Automation
 
-Only a manual dispatch requests publication. Development-only `release-it` manages versions, Git operations, npm OIDC publishing, and GitHub Releases; project hooks format the changelog and validate the exact archive, metadata, remote references, and registry integrity.
+Only a manual dispatch requests publication. The exact development dependency and matching reusable workflow from `npm-package-release` manage release operations. `npr.config.js` selects `IntrideaChangelog`, updates the README Installation section to the released version, and runs existing packed-consumer fixtures against the retained archive.
 
-Publish the tested archive, atomically push the release commit and tag, create the GitHub Release, then validate and push the next development patch. Keep the README installation pin at the released version. Failures retain the archive, checksum, and metadata patch; never blindly republish, overwrite versions, delete release tags, or reset source changes. See [Releasing](RELEASING.md) for setup, authorization, and recovery.
+Require artifact preservation before publication. Publish the tested archive, atomically push the release commit and tag, create the GitHub Release, then validate and push the next development patch before registry confirmation. Keep the README installation pin at the released version. Failures retain structured release state, the archive, and recovery Git bundles; never blindly republish, overwrite versions, delete release tags, or reset source changes. See [Releasing](RELEASING.md) for setup, authorization, and recovery.
 
 ## Logo
 

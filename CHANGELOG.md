@@ -3,6 +3,7 @@
 ## 0.2.1 (Next)
 
 - [#18](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/18): Fix empty archive overrides during next-version validation and retain hidden release recovery artifacts - [@dblock](https://github.com/dblock).
+- [#19](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/19): Replace custom release automation with npm-package-release and its reusable workflow, preserving changelog, README pins, and exact-archive consumer validation - [@dblock](https://github.com/dblock).
 - Your contribution here.
 
 ## 0.2.0 (2026/11/08)
