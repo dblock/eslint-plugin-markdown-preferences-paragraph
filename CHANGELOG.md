@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 (Next)
+
+- Your contribution here.
+
 ## 0.3.0 (2026/11/26)
 
 - [#18](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/18): Fix empty archive overrides during next-version validation and retain hidden release recovery artifacts - [@dblock](https://github.com/dblock).
