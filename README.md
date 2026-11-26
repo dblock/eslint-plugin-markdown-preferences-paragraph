@@ -12,7 +12,7 @@ An ESLint plugin for checking Markdown paragraph wrapping and word counts, with 
 npm install --save-dev eslint @eslint/markdown eslint-plugin-markdown-preferences-paragraph@0.2.0
 ```
 
-Requires Node.js 22.13 or a supported newer version, ESLint 9.39 or 10.x, and `@eslint/markdown` 8.x.
+Requires Node.js 22.13 or a supported newer version, ESLint 9.39 or 10.x, and `@eslint/markdown` 8.x or 9.x.
 
 ## Usage
 
