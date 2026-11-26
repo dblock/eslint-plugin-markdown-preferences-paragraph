@@ -38,6 +38,9 @@ export async function consumer(archivePath = process.env.PACKAGE_ARCHIVE ?? proc
         "@eslint/markdown": markdown.meta.version,
         "eslint-plugin-markdown-preferences": preferences.meta.version,
       },
+      // Mirror the development-only peer overrides for third-party plugins that do not yet declare
+      // the selected @eslint/markdown major; this plugin's own peer range is still checked strictly.
+      overrides: JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8")).overrides,
     }));
     execFileSync(npm, [
       "install", "--ignore-scripts", "--no-audit", "--no-fund",

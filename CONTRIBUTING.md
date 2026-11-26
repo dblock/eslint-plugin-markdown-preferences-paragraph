@@ -4,7 +4,7 @@ Read [Design](DESIGN.md) and [Automated Contributor Instructions](AGENTS.md). Th
 
 ## Setup and Validation
 
-Use Node.js `26.13.0` from `.nvmrc` for development and npm. The package supports Node.js `^22.13.0 || >=24.0.0`, ESLint `^9.39.0 || ^10.0.0`, and `@eslint/markdown ^8.0.0`. Documentation spelling tools require Node.js 22.18 on the 22.x line or Node.js 24 or later; the compatibility test matrix exercises the package's lower runtime minimum without running those tools there. Recheck stable releases when selecting or updating dependencies while preserving supported-runtime compatibility.
+Use Node.js `26.13.0` from `.nvmrc` for development and npm. The package supports Node.js `^22.13.0 || >=24.0.0`, ESLint `^9.39.0 || ^10.0.0`, and `@eslint/markdown ^8.0.0 || ^9.0.0`. Development installs `@eslint/markdown` 9. Because `eslint-plugin-markdown-preferences` and `eslint-plugin-prose-spellcheck` do not yet declare 9 in their peer ranges, `package.json` `overrides` let only those development dependencies use the root `@eslint/markdown`; the packed-consumer test mirrors these overrides for its third-party plugins. npm applies overrides only in this project, so consumers are unaffected; remove each override once its upstream peer range includes 9. Documentation spelling tools require Node.js 22.18 on the 22.x line or Node.js 24 or later; the compatibility test matrix exercises the package's lower runtime minimum without running those tools there. Recheck stable releases when selecting or updating dependencies while preserving supported-runtime compatibility.
 
 ```sh
 npm ci
@@ -20,7 +20,7 @@ Run `npm test` and `npm run lint` before every push, including updates to a PR. 
 
 Keep human-readable Markdown headings and YAML display names in title case, preserving proper names and code identifiers. Keep each Markdown prose paragraph on one source line. Review `.spellcheck.txt` additions and fix typos instead of adding them to the dictionary. Intentionally invalid file fixtures are not project documentation.
 
-Test, Lint, and Package have separate CI workflows. Tests cover minimum/current Node versions and supported ESLint majors using explicit inline `matrix.entry` records without `include`/`exclude`; a current-Node coverage job reports to Coveralls. ESLint 9 compatibility is retained for existing Markdown setups while development and lint use current ESLint 10. Both compatibility pairs use strict peer resolution and run documentation fixtures on supported Node versions. No Danger checks are configured for this JavaScript project.
+Test, Lint, and Package have separate CI workflows. Tests cover minimum/current Node versions, supported ESLint majors, and `@eslint/markdown` 8 and 9 using explicit inline `matrix.entry` records without `include`/`exclude`; a current-Node coverage job reports to Coveralls. ESLint 9 compatibility is retained for existing Markdown setups while development and lint use current ESLint 10. Both compatibility pairs use strict peer resolution and run documentation fixtures on supported Node versions. No Danger checks are configured for this JavaScript project.
 
 ## Tests
 
