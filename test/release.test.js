@@ -17,12 +17,16 @@ test("the release configuration preserves README pins and validates the retained
   t.after(() => project.dispose());
   const root = fileURLToPath(new URL("../", import.meta.url));
   await project.copyFiles(root, [
-    ".gitignore", "README.md", "CHANGELOG.md", "LICENSE",
+    ".gitignore", "README.md", "LICENSE",
     "CONTRIBUTING.md", "DESIGN.md", "RELEASING.md",
     "assets/logo.svg", "test/plugin.test.js", "test/integration.test.js",
   ]);
   await project.copyFiles(root, "{src,test-support}/**/*.js");
   await project.copyFiles(root, "test/fixtures/integration/{numeric-basic,balanced-basic,max-words-basic}/*");
+  await project.write("CHANGELOG.md", [
+    "# Changelog", "", "## 0.2.2 (Next)", "",
+    "- Exercise the release workflow.", "- Your contribution here.", "",
+  ].join("\n"));
   const manifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
   const { eslint, "@eslint/markdown": markdown, "eslint-plugin-markdown-preferences": preferences } = manifest.devDependencies;
   await project.write("package.json", JSON.stringify({

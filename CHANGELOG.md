@@ -6,6 +6,7 @@
 - [#19](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/19): Replace custom release automation with npm-package-release and its reusable workflow, preserving changelog, README pins, and exact-archive consumer validation - [@dblock](https://github.com/dblock).
 - [#20](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/20): Upgrade npm-package-release and its reusable workflow to 0.2.0 - [@dblock](https://github.com/dblock).
 - [#21](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/21): Support `@eslint/markdown` 9 alongside 8, develop against 9, and test both majors in CI - [@dblock](https://github.com/dblock).
+- [#22](https://github.com/dblock/eslint-plugin-markdown-preferences-paragraph/pull/22): Use a synthetic changelog in the release simulation test so release preparation can run it - [@dblock](https://github.com/dblock).
 - Your contribution here.
 
 ## 0.2.0 (2026/11/08)
